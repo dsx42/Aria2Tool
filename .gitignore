@@ -1,0 +1,9 @@
+target/
+aria2.conf
+aria2.session
+aria2.log
+.netrc
+server.status
+cookies.sqlite
+dht.dat
+dht6.dat
