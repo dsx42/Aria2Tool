@@ -314,14 +314,14 @@ function GetTrackers {
         Write-Host -Object "Tracker 来源: $Url"
         $Content = $null
         try {
-            $Content = Invoke-RestMethod -Method Get -Uri "$Url" -TimeoutSec 10
+            $Content = Invoke-RestMethod -Method Get -Uri "$Url" -TimeoutSec 1
         }
         catch {
             $Content = $null
         }
         if ([System.String]::IsNullOrEmpty($Content)) {
             try {
-                $Content = Invoke-RestMethod -Method Get -Uri "$GithubProxy/$Url" -TimeoutSec 10
+                $Content = Invoke-RestMethod -Method Get -Uri "$GithubProxy/$Url" -TimeoutSec 3
             }
             catch {
                 $Content = $null
@@ -393,7 +393,7 @@ function SaveSession {
 
     $Response = $null
     try {
-        $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 3 `
+        $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 1 `
             -Body (ConvertTo-Json -InputObject $Params) -ContentType 'application/json'
     }
     catch {
@@ -423,7 +423,7 @@ function Shutdown {
 
     $Response = $null
     try {
-        $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 3 `
+        $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 1 `
             -Body (ConvertTo-Json -InputObject $Params) -ContentType 'application/json'
     }
     catch {
@@ -453,7 +453,7 @@ function ForceShutdown {
 
     $Response = $null
     try {
-        $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 3 `
+        $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 1 `
             -Body (ConvertTo-Json -InputObject $Params) -ContentType 'application/json'
     }
     catch {
@@ -504,7 +504,7 @@ function UpdateTracker {
 
     $Response = $null
     try {
-        $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 3 `
+        $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 1 `
             -Body (ConvertTo-Json -InputObject $Params) -ContentType 'application/json'
     }
     catch {
@@ -521,9 +521,9 @@ function UpdateTracker {
         return
     }
 
+    SaveSession
     Write-Host -Object ''
     Write-Host -Object '更新 Tracker 成功' -ForegroundColor Green
-    SaveSession
 }
 
 function StartAria2 {
@@ -632,6 +632,7 @@ function CreateShortcut {
     $Shortcut2 = $WScriptShell.CreateShortcut("$TargetPath2")
     $Shortcut2.TargetPath = "$PSScriptRoot\index.html"
     $Shortcut2.WindowStyle = 1
+    $Shortcut2.IconLocation = "$PSScriptRoot\AriaNg.ico"
     $Shortcut2.WorkingDirectory = "$PSScriptRoot"
     $Shortcut2.Save()
 

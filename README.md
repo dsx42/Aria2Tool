@@ -1,6 +1,8 @@
 # Aria2Tool 简介
 
-提高 Aria2 使用体验的小工具
+* 提高 Aria2 使用体验的小工具：集成封装 Aria2 和 AriaNg 项目
+* 提供优化的 Aria2 的配置
+* 可更新 BT 下载使用的 Tracker
 
 # 下载
 
@@ -28,6 +30,19 @@
 
 * 本工具使用的 `index.html` 用于下载任务的管理界面
 * 提取自 AriaNg 项目的 AllInOne 编译产物： https://github.com/q3aql/aria2-static-builds/releases
+
+## AriaNg.ico
+
+* 本工具使用的 `AriaNg.ico` 用于 `index.html` 的快捷方式图标
+* 提取自 AriaNg-Native 项目的资源文件：https://github.com/mayswind/AriaNg-Native
+
+## BT Tracker 来源
+
+BT Tracker 从以下来源更新：
+
+* https://github.com/ngosang/trackerslist
+* https://github.com/DeSireFire/animeTrackerList
+* https://github.com/XIU2/TrackersListCollection
 
 # 参考资料
 
