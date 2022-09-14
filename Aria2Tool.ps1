@@ -552,6 +552,24 @@ function AutoUpdateBtTrackerByAria2Tool {
     $TimeSpan = New-Object -TypeName 'System.TimeSpan' -ArgumentList 8, 0, 0
     $ScheduledJob = Register-ScheduledJob -ScriptBlock {
         param($Path)
+
+        $Exist = Test-Path -Path "$Path\Aria2Tool.ps1" -PathType Leaf
+        $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
+
+        if (!$Exist -or !$Aria2Process) {
+            $ScheduledJob = Get-ScheduledJob -Name 'AutoUpdateBtTrackerByAria2Tool' -ErrorAction SilentlyContinue
+            if ($ScheduledJob) {
+                $JobTrigger = Get-JobTrigger -InputObject $ScheduledJob
+                if ($JobTrigger) {
+                    Disable-JobTrigger -InputObject $JobTrigger
+                    Remove-JobTrigger -InputObject $ScheduledJob
+                }
+                Disable-ScheduledJob -InputObject $ScheduledJob
+                Unregister-ScheduledJob -InputObject $ScheduledJob -Force
+            }
+            return
+        }
+
         PowerShell -NoProfile -ExecutionPolicy RemoteSigned -File "$Path\Aria2Tool.ps1" -UpdateTracker
     } -Name 'AutoUpdateBtTrackerByAria2Tool' -ArgumentList "$PSScriptRoot" -RunNow -RunEvery $TimeSpan
 }
@@ -710,7 +728,7 @@ function AutoStart {
 
     [System.IO.File]::WriteAllLines("$TargetPath", ("new ActiveXObject('Shell.Application')." `
                 + "ShellExecute('PowerShell', '-NoProfile -ExecutionPolicy RemoteSigned -File $FilePath " `
-                + "-StartAria2', null, null, 0);"), $Utf8NoBomEncoding)
+                + "-StartAria2', null, 'runas', 0);"), $Utf8NoBomEncoding)
 
     Write-Host -Object ''
     Write-Host -Object '下载服务 Aria2 成功设为开机启动' -ForegroundColor Green
@@ -829,7 +847,7 @@ if ($Version) {
     return $VersionInfo
 }
 
-#RequireAdmin
+RequireAdmin
 
 $PSDefaultParameterValues['*:Encoding'] = 'utf8'
 $ProgressPreference = 'SilentlyContinue'
