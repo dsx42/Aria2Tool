@@ -1,4 +1,8 @@
-﻿param([switch]$StartAria2)
+﻿param(
+    [switch]$StartAria2,
+    [switch]$UpdateTracker,
+    [switch]$Version
+)
 
 function RequireAdmin {
     $CurrentWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -16,14 +20,14 @@ function RequireAdmin {
 function GetVertion {
     $ProductJsonPath = "$PSScriptRoot\product.json"
 
-    if (!(Test-Path -Path $ProductJsonPath -PathType Leaf)) {
+    if (!(Test-Path -Path "$ProductJsonPath" -PathType Leaf)) {
         Write-Warning -Message ("$ProductJsonPath 不存在")
         [System.Environment]::Exit(0)
     }
 
     $ProductInfo = $null
     try {
-        $ProductInfo = Get-Content -Path $ProductJsonPath | ConvertFrom-Json
+        $ProductInfo = Get-Content -Path "$ProductJsonPath" | ConvertFrom-Json
     }
     catch {
         Write-Warning -Message ("$ProductJsonPath 解析失败")
@@ -244,7 +248,7 @@ function WriteAria2Config {
         'enable-mmap'                      = "$EnableMmap";
         'file-allocation'                  = "$FileAllocation";
         'save-not-found'                   = 'false';
-        'log-level'                        = 'warn';
+        'log-level'                        = 'notice';
         'summary-interval'                 = '0';
         'save-session'                     = "$PSScriptRoot\aria2.session";
         'save-session-interval'            = '20'
@@ -321,7 +325,7 @@ function GetTrackers {
         }
         if ([System.String]::IsNullOrEmpty($Content)) {
             try {
-                $Content = Invoke-RestMethod -Method Get -Uri "$GithubProxy/$Url" -TimeoutSec 3
+                $Content = Invoke-RestMethod -Method Get -Uri "$GithubProxy/$Url" -TimeoutSec 5
             }
             catch {
                 $Content = $null
@@ -344,7 +348,8 @@ function GetTrackers {
             }
 
             $StrArray = $Str.Replace('udp://', ',udp://').Replace('http://', ',http://').Replace('https://', `
-                    ',https://').Replace('wss://', ',wss://').Replace('ws://', ',ws://').Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
+                    ',https://').Replace('wss://', ',wss://').Replace('ws://', ',ws://').Split(',', `
+                    [System.StringSplitOptions]::RemoveEmptyEntries)
             if ($null -eq $StrArray -or $StrArray.Length -le 0) {
                 continue
             }
@@ -526,9 +531,41 @@ function UpdateTracker {
     Write-Host -Object '更新 Tracker 成功' -ForegroundColor Green
 }
 
+function AutoUpdateBtTrackerByAria2Tool {
+    param([switch]$Enabled)
+
+    $ScheduledJob = Get-ScheduledJob -Name 'AutoUpdateBtTrackerByAria2Tool' -ErrorAction SilentlyContinue
+    if ($ScheduledJob) {
+        $JobTrigger = Get-JobTrigger -InputObject $ScheduledJob
+        if ($JobTrigger) {
+            Disable-JobTrigger -InputObject $JobTrigger
+            Remove-JobTrigger -InputObject $ScheduledJob
+        }
+        Disable-ScheduledJob -InputObject $ScheduledJob
+        Unregister-ScheduledJob -InputObject $ScheduledJob -Force
+    }
+
+    if (!$Enabled) {
+        return
+    }
+
+    $TimeSpan = New-Object -TypeName 'System.TimeSpan' -ArgumentList 8, 0, 0
+    $ScheduledJob = Register-ScheduledJob -ScriptBlock {
+        param($Path)
+        PowerShell -NoProfile -ExecutionPolicy RemoteSigned -File "$Path\Aria2Tool.ps1" -UpdateTracker
+    } -Name 'AutoUpdateBtTrackerByAria2Tool' -ArgumentList "$PSScriptRoot" -RunNow -RunEvery $TimeSpan
+}
+
 function StartAria2 {
 
     Clear-Host
+
+    $SystemInfo = Get-CimInstance -ClassName Win32_OperatingSystem
+    if (!$SystemInfo.OSArchitecture.Contains('64')) {
+        Write-Host -Object ''
+        Write-Host -Object '不支持的系统，目前只支持 64 位系统, Aria2 启动失败' -ForegroundColor Red
+        return
+    }
 
     $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
     if ($Aria2Process) {
@@ -538,7 +575,7 @@ function StartAria2 {
         return
     }
 
-    WriteAria2Config -Trackers (GetTrackers)
+    WriteAria2Config
 
     $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
     if ($Aria2Process) {
@@ -553,6 +590,7 @@ function StartAria2 {
 
     $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
     if ($Aria2Process) {
+        AutoUpdateBtTrackerByAria2Tool -Enabled
         Write-Host -Object ''
         Write-Host -Object 'Aria2 启动成功' -ForegroundColor Green
         return
@@ -565,6 +603,8 @@ function StartAria2 {
 function StopAria2 {
 
     Clear-Host
+
+    AutoUpdateBtTrackerByAria2Tool
 
     $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
     if (!$Aria2Process) {
@@ -685,11 +725,10 @@ function MainMenu {
         '2' = '关闭下载服务 Aria2';
         '3' = '查看当前下载服务 Aria2 状态';
         '4' = '打开下载管理界面 AriaNg';
-        '5' = 'BT 下载加速';
-        '6' = '创建桌面快捷方式';
-        '7' = '创建开始菜单快捷方式';
-        '8' = '开机启动下载服务 Aria2';
-        '9' = '删除开机启动下载服务 Aria2';
+        '5' = '创建桌面快捷方式';
+        '6' = '创建开始菜单快捷方式';
+        '7' = '开机启动下载服务 Aria2';
+        '8' = '删除开机启动下载服务 Aria2';
         'q' = '退出'
     }
 
@@ -759,30 +798,24 @@ function MainMenu {
         MainMenu
     }
     if ('5' -eq $InputOption) {
-        UpdateTracker
-        Write-Host -Object ''
-        Read-Host -Prompt '按确认键返回主菜单'
-        MainMenu
-    }
-    if ('6' -eq $InputOption) {
         CreateShortcut -Desktop
         Write-Host -Object ''
         Read-Host -Prompt '按确认键返回主菜单'
         MainMenu
     }
-    if ('7' -eq $InputOption) {
+    if ('6' -eq $InputOption) {
         CreateShortcut
         Write-Host -Object ''
         Read-Host -Prompt '按确认键返回主菜单'
         MainMenu
     }
-    if ('8' -eq $InputOption) {
+    if ('7' -eq $InputOption) {
         AutoStart -Enabled
         Write-Host -Object ''
         Read-Host -Prompt '按确认键返回主菜单'
         MainMenu
     }
-    if ('9' -eq $InputOption) {
+    if ('8' -eq $InputOption) {
         AutoStart
         Write-Host -Object ''
         Read-Host -Prompt '按确认键返回主菜单'
@@ -805,6 +838,9 @@ Set-Location -Path "$PSScriptRoot"
 
 if ($StartAria2) {
     StartAria2
+}
+elseif ($UpdateTracker) {
+    UpdateTracker
 }
 else {
     MainMenu
