@@ -23,7 +23,7 @@ function RequireAdmin {
             }
         }
         Start-Process -FilePath PowerShell.exe -ArgumentList `
-            "-NoProfile -ExecutionPolicy RemoteSigned -File `"$ScriptFile`" $ScriptParams" -Verb RunAs `
+            "-NoProfile -ExecutionPolicy RemoteSigned -File `"$ScriptFile`"$ScriptParams" -Verb RunAs `
             -WindowStyle Normal
         [System.Environment]::Exit(0)
     }
@@ -531,14 +531,13 @@ function UpdateTracker {
         }
         $Response = $null
     }
+    SaveSession
     if (!$Response -or !$Response.result -or $Response.result -ine 'OK') {
         Write-Host -Object ''
         Write-Host -Object '更新 Tracker 失败' -ForegroundColor Red
-        SaveSession
         return
     }
 
-    SaveSession
     Write-Host -Object ''
     Write-Host -Object '更新 Tracker 成功' -ForegroundColor Green
 }
@@ -561,8 +560,9 @@ function AutoUpdateBtTrackerByAria2Tool {
         return
     }
 
-    $TimeSpan = New-Object -TypeName 'System.TimeSpan' -ArgumentList 8, 0, 0
-    $ScheduledJob = Register-ScheduledJob -ScriptBlock {
+    $TimeSpan = New-Object -TypeName 'System.TimeSpan' -ArgumentList 4, 0, 0
+    $JobOption = New-ScheduledJobOption -RunElevated -RequireNetwork -ContinueIfGoingOnBattery -StartIfOnBattery
+    Register-ScheduledJob -ScriptBlock {
         param($Path)
 
         $Exist = Test-Path -Path "$Path\Aria2Tool.ps1" -PathType Leaf
@@ -583,7 +583,8 @@ function AutoUpdateBtTrackerByAria2Tool {
         }
 
         PowerShell -NoProfile -ExecutionPolicy RemoteSigned -File "$Path\Aria2Tool.ps1" -UpdateTracker
-    } -Name 'AutoUpdateBtTrackerByAria2Tool' -ArgumentList "$PSScriptRoot" -RunNow -RunEvery $TimeSpan
+    } -Name 'AutoUpdateBtTrackerByAria2Tool' -ScheduledJobOption $JobOption -ArgumentList "$PSScriptRoot" -RunNow `
+        -RunEvery $TimeSpan | Out-Null
 }
 
 function StartAria2 {
@@ -600,6 +601,7 @@ function StartAria2 {
     $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
     if ($Aria2Process) {
         SaveSession
+        AutoUpdateBtTrackerByAria2Tool -Enabled
         Write-Host -Object ''
         Write-Host -Object 'Aria2 运行中' -ForegroundColor Green
         return
@@ -610,6 +612,7 @@ function StartAria2 {
     $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
     if ($Aria2Process) {
         SaveSession
+        AutoUpdateBtTrackerByAria2Tool -Enabled
         Write-Host -Object ''
         Write-Host -Object 'Aria2 运行中' -ForegroundColor Green
         return
@@ -720,30 +723,110 @@ function AutoStart {
 
     Clear-Host
 
-    $TargetPath = [System.Environment]::GetFolderPath([Environment+SpecialFolder]::Startup) + '\AutoStartAria2.js'
-    if (!$Enabled) {
-        if (Test-Path -Path "$TargetPath" -PathType Leaf) {
-            Remove-Item -Path "$TargetPath" -Force
+    $ScheduledJob = Get-ScheduledJob -Name 'AutoStartAria2ByAria2Tool' -ErrorAction SilentlyContinue
+    if ($ScheduledJob) {
+        $JobTrigger = Get-JobTrigger -InputObject $ScheduledJob
+        if ($JobTrigger) {
+            Disable-JobTrigger -InputObject $JobTrigger
+            Remove-JobTrigger -InputObject $ScheduledJob
         }
+        Disable-ScheduledJob -InputObject $ScheduledJob
+        Unregister-ScheduledJob -InputObject $ScheduledJob -Force
+    }
+
+    if (!$Enabled) {
         Write-Host -Object ''
         Write-Host -Object '删除开机启动下载服务 Aria2 成功' -ForegroundColor Green
         return
     }
 
-    if (Test-Path -Path "$TargetPath" -PathType Leaf) {
-        Remove-Item -Path "$TargetPath" -Force
-    }
+    $JobTrigger = New-JobTrigger -AtLogOn
+    $ScheduledJobOption = New-ScheduledJobOption -RunElevated -WakeToRun -ContinueIfGoingOnBattery -StartIfOnBattery
 
-    $FilePath = "`"$PSScriptRoot\Aria2Tool.ps1`"".Replace('\', '\\')
+    Register-ScheduledJob -ScriptBlock {
+        param($Path)
 
-    $Utf8NoBomEncoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
+        $Exist = Test-Path -Path "$Path\Aria2Tool.ps1" -PathType Leaf
 
-    [System.IO.File]::WriteAllLines("$TargetPath", ("new ActiveXObject('Shell.Application')." `
-                + "ShellExecute('PowerShell', '-NoProfile -ExecutionPolicy RemoteSigned -File $FilePath " `
-                + "-StartAria2', null, 'runas', 0);"), $Utf8NoBomEncoding)
+        if (!$Exist) {
+            $ScheduledJob = Get-ScheduledJob -Name 'AutoStartAria2ByAria2Tool' -ErrorAction SilentlyContinue
+            if ($ScheduledJob) {
+                $JobTrigger = Get-JobTrigger -InputObject $ScheduledJob
+                if ($JobTrigger) {
+                    Disable-JobTrigger -InputObject $JobTrigger
+                    Remove-JobTrigger -InputObject $ScheduledJob
+                }
+                Disable-ScheduledJob -InputObject $ScheduledJob
+                Unregister-ScheduledJob -InputObject $ScheduledJob -Force
+            }
+            return
+        }
+
+        PowerShell -NoProfile -ExecutionPolicy RemoteSigned -File "$Path\Aria2Tool.ps1" -StartAria2
+    } -Name 'AutoStartAria2ByAria2Tool' -Trigger $JobTrigger -ScheduledJobOption $ScheduledJobOption `
+        -ArgumentList "$PSScriptRoot" | Out-Null
 
     Write-Host -Object ''
     Write-Host -Object '下载服务 Aria2 成功设为开机启动' -ForegroundColor Green
+}
+
+function AddBrowserAddon {
+
+    Clear-Host
+
+    $RegPaths = @(
+        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice',
+        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice',
+        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.html\UserChoice',
+        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.htm\UserChoice'
+    )
+
+    $Broswer = ''
+    foreach ($RegPath in $RegPaths) {
+        $PropertyValue = Get-ItemPropertyValue -Path "$RegPath" -Name 'ProgID'
+        if ([System.String]::IsNullOrEmpty($PropertyValue)) {
+            continue
+        }
+        if ($PropertyValue.Contains('Firefox')) {
+            $Broswer = 'Firefox'
+            break
+        }
+        if ($PropertyValue.Contains('Chrome')) {
+            $Broswer = 'Chrome'
+            break
+        }
+        if ($PropertyValue.Contains('Edge')) {
+            $Broswer = 'Edge'
+            break
+        }
+    }
+
+    if ([System.String]::IsNullOrEmpty($Broswer)) {
+        Write-Host -Object ''
+        Write-Warning -Message '不支持当前系统默认浏览器，只支持 Microsoft Edge、Google Chrome 和 Firefox 浏览器'
+        return
+    }
+
+    if ($Broswer -ieq 'Chrome') {
+        Start-Process -FilePath 'https://chrome.google.com/webstore/detail/aria2-for-chrome/mpkodccbngfoacfalldjimigbofkhgjn'
+        Write-Host -Object ''
+        Write-Host -Object '请在 Google Chrome 浏览器打开的页面点击 "添加至 Chrome"' -ForegroundColor Green
+        return
+    }
+
+    if ($Broswer -ieq 'Firefox') {
+        Start-Process -FilePath 'https://addons.mozilla.org/zh-CN/firefox/addon/aria2-integration'
+        Write-Host -Object ''
+        Write-Host -Object '请在 Firefox 浏览器打开的页面点击 "添加到 Firefox"' -ForegroundColor Green
+        return
+    }
+
+    if ($Broswer -ieq 'Edge') {
+        Start-Process -FilePath 'https://microsoftedge.microsoft.com/addons/detail/aria2-for-edge/jjfgljkjddpcpfapejfkelkbjbehagbh'
+        Write-Host -Object ''
+        Write-Host -Object '请在 Microsoft Edge 浏览器打开的页面点击 "获取"' -ForegroundColor Green
+        return
+    }
 }
 
 function MainMenu {
@@ -759,6 +842,7 @@ function MainMenu {
         '6' = '创建开始菜单快捷方式';
         '7' = '开机启动下载服务 Aria2';
         '8' = '删除开机启动下载服务 Aria2';
+        '9' = '安装浏览器扩展';
         'q' = '退出'
     }
 
@@ -847,6 +931,12 @@ function MainMenu {
     }
     if ('8' -eq $InputOption) {
         AutoStart
+        Write-Host -Object ''
+        Read-Host -Prompt '按确认键返回主菜单'
+        MainMenu
+    }
+    if ('9' -eq $InputOption) {
+        AddBrowserAddon
         Write-Host -Object ''
         Read-Host -Prompt '按确认键返回主菜单'
         MainMenu
