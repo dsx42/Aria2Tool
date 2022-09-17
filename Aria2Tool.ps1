@@ -106,8 +106,9 @@ function GetDownloadPath {
         }
     }
 
-    $DownloadPath = [System.Environment]::GetFolderPath([Environment+SpecialFolder]::UserProfile) + '\Downloads'
-    if (Test-Path -Path "$DownloadPath" -PathType Container) {
+    $DownloadPath = Get-ItemPropertyValue -Path ('Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows' `
+            + '\CurrentVersion\Explorer\Shell Folders') -Name '{374DE290-123F-4565-9164-39C4925E467B}'
+    if (!([System.String]::IsNullOrEmpty($DownloadPath)) -and (Test-Path -Path "$DownloadPath" -PathType Container)) {
         return $DownloadPath
     }
 
