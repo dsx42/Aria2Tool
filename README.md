@@ -2,7 +2,7 @@
 
 * 提高 Aria2 使用体验的小工具：集成封装 Aria2 和 AriaNg 项目
 * 提供优化的 Aria2 的配置
-* 可更新 BT 下载使用的 Tracker
+* 自动更新 BT 下载使用的 Tracker
 
 # 下载
 
@@ -36,12 +36,7 @@
 ## aria2c.exe
 
 * 本工具使用的 `aria2c.exe` 用于提供下载能力
-* 提取自 Aria2 项目的静态编译产物：https://github.com/q3aql/aria2-static-builds/releases
-
-## ca-certificates.crt
-
-* 本工具使用的 `ca-certificates.crt` 用于 HTTPS 下载
-* 提取自 Aria2 项目的静态编译产物：https://github.com/q3aql/aria2-static-builds/releases
+* 提取自 Aria2 项目：https://github.com/aria2/aria2/releases
 
 ## index.html
 

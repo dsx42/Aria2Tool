@@ -3,7 +3,7 @@
     "author": "dsx42",
     "license": "GPL-3.0",
     "home": "https://github.com/dsx42/Aria2Tool",
-    "version": "2022.9.18",
+    "version": "2022.9.22",
     "files": [
         "Aria2Tool.cmd",
         "Aria2Tool.ps1",
@@ -11,7 +11,6 @@
         "LICENSE",
         "README.md",
         "aria2c.exe",
-        "ca-certificates.crt",
         "index.html",
         "AriaNg.ico"
     ]

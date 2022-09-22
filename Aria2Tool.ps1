@@ -95,6 +95,38 @@ function GetOldAria2Config {
     return $Config
 }
 
+function GetDefaultBrowser {
+
+    $RegPaths = @(
+        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice',
+        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice',
+        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.html\UserChoice',
+        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.htm\UserChoice'
+    )
+
+    $Browser = ''
+    foreach ($RegPath in $RegPaths) {
+        $PropertyValue = Get-ItemPropertyValue -Path "$RegPath" -Name 'ProgID'
+        if ([System.String]::IsNullOrEmpty($PropertyValue)) {
+            continue
+        }
+        if ($PropertyValue.Contains('Firefox')) {
+            $Browser = 'Firefox'
+            break
+        }
+        if ($PropertyValue.Contains('Chrome')) {
+            $Browser = 'Chrome'
+            break
+        }
+        if ($PropertyValue.Contains('Edge')) {
+            $Browser = 'Edge'
+            break
+        }
+    }
+
+    return $Browser
+}
+
 function GetDownloadPath {
     param ($OldConfig)
 
@@ -202,6 +234,39 @@ function WriteAria2Config {
         $DiskCache = 32
     }
 
+    $Browser = GetDefaultBrowser
+    $UserAgent = 'Transmission/3.00'
+    $CookiesPath = ''
+    if ($Browser -ieq 'Chrome') {
+        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
+            + 'Chrome/105.0.0.0 Safari/537.36'
+    }
+    elseif ($Browser -ieq 'Edge') {
+        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
+            + 'Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.42'
+    }
+    elseif ($Browser -ieq 'Firefox') {
+        $UserAgent =  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0'
+        if (Test-Path -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -PathType Container) {
+            $Directorys = Get-ChildItem -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -Force -Directory
+            if ($null -ne $Directorys -and $Directorys.Length -gt 0) {
+                foreach($Direcroty in $Directorys) {
+                    if (!$Direcroty) {
+                        continue
+                    }
+                    $FullName = $Direcroty.FullName
+                    if ([System.String]::IsNullOrEmpty($FullName)) {
+                        continue
+                    }
+                    if (Test-Path -Path "${FullName}\cookies.sqlite" -PathType Leaf) {
+                        $CookiesPath = "${FullName}\cookies.sqlite"
+                        break
+                    }
+                }
+            }
+        }
+    }
+
     $Aria2Config = [ordered]@{
         'dir'                              = "$DownloadPath";
         'input-file'                       = "$PSScriptRoot\aria2.session";
@@ -220,11 +285,9 @@ function WriteAria2Config {
         'split'                            = '16';
         'stream-piece-selector'            = 'geom';
         'timeout'                          = '10';
-        'ca-certificate'                   = "$PSScriptRoot\ca-certificates.crt";
         'http-accept-gzip'                 = 'true';
-        'load-cookies'                     = "$PSScriptRoot\cookies.sqlite";
-        'save-cookies'                     = "$PSScriptRoot\cookies.sqlite";
-        'user-agent'                       = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36';
+        'load-cookies'                     = "$CookiesPath";
+        'user-agent'                       = "$UserAgent";
         'bt-detach-seed-only'              = 'true';
         'bt-enable-lpd'                    = 'true';
         'bt-force-encryption'              = 'true';
@@ -247,6 +310,8 @@ function WriteAria2Config {
         'enable-dht6'                      = 'true';
         'follow-torrent'                   = 'false';
         'listen-port'                      = '51413';
+        'peer-id-prefix'                   = '-TR3000-';
+        'peer-agent'                       = 'Transmission/3.00';
         'enable-rpc'                       = 'true';
         'rpc-allow-origin-all'             = 'true';
         'rpc-listen-all'                   = 'true';
@@ -282,13 +347,13 @@ function WriteAria2Config {
     if (!(Test-Path -Path "$PSScriptRoot\server.status" -PathType Leaf)) {
         New-Item -Path "$PSScriptRoot\server.status" -ItemType File -Force | Out-Null
     }
-    if (!(Test-Path -Path "$PSScriptRoot\cookies.sqlite" -PathType Leaf)) {
-        New-Item -Path "$PSScriptRoot\cookies.sqlite" -ItemType File -Force | Out-Null
-    }
 
     $ConfigArray = @()
     $Utf8NoBomEncoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
     foreach ($Config in $Aria2Config.GetEnumerator()) {
+        if ([System.String]::IsNullOrEmpty($Config.Key) -or [System.String]::IsNullOrEmpty($Config.Value)) {
+            continue
+        }
         $ConfigArray += ($Config.Key + '=' + $Config.Value)
     }
 
@@ -775,55 +840,31 @@ function AddBrowserAddon {
 
     Clear-Host
 
-    $RegPaths = @(
-        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice',
-        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice',
-        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.html\UserChoice',
-        'Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.htm\UserChoice'
-    )
-
-    $Broswer = ''
-    foreach ($RegPath in $RegPaths) {
-        $PropertyValue = Get-ItemPropertyValue -Path "$RegPath" -Name 'ProgID'
-        if ([System.String]::IsNullOrEmpty($PropertyValue)) {
-            continue
-        }
-        if ($PropertyValue.Contains('Firefox')) {
-            $Broswer = 'Firefox'
-            break
-        }
-        if ($PropertyValue.Contains('Chrome')) {
-            $Broswer = 'Chrome'
-            break
-        }
-        if ($PropertyValue.Contains('Edge')) {
-            $Broswer = 'Edge'
-            break
-        }
-    }
-
-    if ([System.String]::IsNullOrEmpty($Broswer)) {
+    $Browser = GetDefaultBrowser
+    if ([System.String]::IsNullOrEmpty($Browser)) {
         Write-Host -Object ''
         Write-Warning -Message '不支持当前系统默认浏览器，只支持 Microsoft Edge、Google Chrome 和 Firefox 浏览器'
         return
     }
 
-    if ($Broswer -ieq 'Chrome') {
-        Start-Process -FilePath 'https://chrome.google.com/webstore/detail/aria2-for-chrome/mpkodccbngfoacfalldjimigbofkhgjn'
+    if ($Browser -ieq 'Chrome') {
+        Start-Process -FilePath ('https://chrome.google.com/webstore/detail/aria2-for-chrome' `
+                + '/mpkodccbngfoacfalldjimigbofkhgjn')
         Write-Host -Object ''
         Write-Host -Object '请在 Google Chrome 浏览器打开的页面点击 "添加至 Chrome"' -ForegroundColor Green
         return
     }
 
-    if ($Broswer -ieq 'Firefox') {
+    if ($Browser -ieq 'Firefox') {
         Start-Process -FilePath 'https://addons.mozilla.org/zh-CN/firefox/addon/aria2-integration'
         Write-Host -Object ''
         Write-Host -Object '请在 Firefox 浏览器打开的页面点击 "添加到 Firefox"' -ForegroundColor Green
         return
     }
 
-    if ($Broswer -ieq 'Edge') {
-        Start-Process -FilePath 'https://microsoftedge.microsoft.com/addons/detail/aria2-for-edge/jjfgljkjddpcpfapejfkelkbjbehagbh'
+    if ($Browser -ieq 'Edge') {
+        Start-Process -FilePath ('https://microsoftedge.microsoft.com/addons/detail/aria2-for-edge' `
+                + '/jjfgljkjddpcpfapejfkelkbjbehagbh')
         Write-Host -Object ''
         Write-Host -Object '请在 Microsoft Edge 浏览器打开的页面点击 "获取"' -ForegroundColor Green
         return
