@@ -41,7 +41,7 @@
 ## index.html
 
 * 本工具使用的 `index.html` 用于下载任务的管理界面
-* 提取自 AriaNg 项目的 AllInOne 编译产物： https://github.com/q3aql/aria2-static-builds/releases
+* 提取自 AriaNg 项目的 AllInOne 编译产物： https://github.com/mayswind/AriaNg/releases
 
 ## AriaNg.ico
 
