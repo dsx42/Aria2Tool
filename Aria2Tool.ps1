@@ -239,11 +239,11 @@ function WriteAria2Config {
     $CookiesPath = ''
     if ($Browser -ieq 'Chrome') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/105.0.0.0 Safari/537.36'
+            + 'Chrome/106.0.0.0 Safari/537.36'
     }
     elseif ($Browser -ieq 'Edge') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.42'
+            + 'Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.53'
     }
     elseif ($Browser -ieq 'Firefox') {
         $UserAgent =  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0'
@@ -437,6 +437,11 @@ function GetTrackers {
                         '').Replace('announce"', 'announce').Replace('announce+', 'announce').Replace('announce-', `
                         'announce')
                 if ([System.String]::IsNullOrEmpty($TrackerStr)) {
+                    continue
+                }
+                if (!$StrTracker.StartsWith('udp://') -and !$StrTracker.StartsWith('http://') `
+                        -and !$StrTracker.StartsWith('https://') -and !$StrTracker.StartsWith('wss://') `
+                        -and !$StrTracker.StartsWith('ws://')) {
                     continue
                 }
                 if (!$TrackerStr.EndsWith('announce') -and !$TrackerStr.EndsWith('announce.php')) {
