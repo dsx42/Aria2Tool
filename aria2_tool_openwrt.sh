@@ -177,6 +177,11 @@ config() {
     if [ -z "${download_dir}" ]; then
         download_dir='/etc/aria2/download/'
     fi
+    if [ ! -d "${download_dir}" ]; then
+        echo ''
+        echo 'download_dir not exist, Config Aria2 fail'
+        return
+    fi
 
     trackers="$(uci get aria2.main.bt_tracker)"
 
@@ -220,7 +225,7 @@ config() {
     uci set aria2.main.user='aria2'
     uci set aria2.main.dir="${download_dir}"
     # input-file auto set
-    uci set aria2.main.config_dir='/etc/aria2/'
+    uci set aria2.main.config_dir='/etc/aria2'
     uci set aria2.main.enable_logging='1'
     uci set aria2.main.log='/etc/aria2/aria2.log'
     uci set aria2.main.max_concurrent_downloads='50'
@@ -304,7 +309,7 @@ config() {
 
     uci commit aria2
 
-    aria2_process="$(pgrep aria2c)"
+    aria2_process="$(service aria2 status | grep 'running')"
     if [ -n "${aria2_process}" ]; then
         save_session
     fi
@@ -341,7 +346,7 @@ start() {
         return
     fi
 
-    aria2_process="$(pgrep aria2c)"
+    aria2_process="$(service aria2 status | grep 'running')"
     if [ -n "${aria2_process}" ]; then
         save_session
         echo ''
@@ -354,7 +359,7 @@ start() {
     config "${download_dir}" "${download_dir_disk_type}"
     service aria2 start
 
-    aria2_process="$(pgrep aria2c)"
+    aria2_process="$(service aria2 status | grep 'running')"
     if [ -n "${aria2_process}" ]; then
         echo ''
         echo 'Aria2 start success'
@@ -365,7 +370,7 @@ start() {
 }
 
 stop() {
-    aria2_process="$(pgrep aria2c)"
+    aria2_process="$(service aria2 status | grep 'running')"
     if [ -z "${aria2_process}" ]; then
         echo ''
         echo 'Aria2 not running'
@@ -377,8 +382,9 @@ stop() {
 
     retry_count=$((1))
     while [ ${retry_count} -le 10 ]; do
-        aria2_process="$(pgrep aria2c)"
+        aria2_process="$(service aria2 status | grep 'running')"
         if [ -z "${aria2_process}" ]; then
+            service aria2 stop
             echo ''
             echo 'Aria2 stop success'
             return
@@ -387,8 +393,9 @@ stop() {
         sleep 3s
     done
 
-    aria2_process="$(pgrep aria2c)"
+    aria2_process="$(service aria2 status | grep 'running')"
     if [ -z "${aria2_process}" ]; then
+        service aria2 stop
         echo ''
         echo 'Aria2 stop success'
         return
@@ -397,14 +404,15 @@ stop() {
     force_shutdown
     sleep 3s
 
-    aria2_process="$(pgrep aria2c)"
+    aria2_process="$(service aria2 status | grep 'running')"
     if [ -z "${aria2_process}" ]; then
+        service aria2 stop
         echo ''
         echo 'Aria2 force stop success'
         return
     fi
 
-    pkill 'aria2c'
+    service aria2 stop
     echo ''
     echo 'Kill Aria2'
 }
@@ -451,7 +459,7 @@ case ${1} in
     stop
     ;;
 'status')
-    aria2_process="$(pgrep aria2c)"
+    aria2_process="$(service aria2 status | grep 'running')"
     if [ -z "${aria2_process}" ]; then
         echo ''
         echo 'Aria2 not running'
