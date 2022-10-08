@@ -243,7 +243,7 @@ function WriteAria2Config {
     }
     elseif ($Browser -ieq 'Edge') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.53'
+            + 'Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.37'
     }
     elseif ($Browser -ieq 'Firefox') {
         $UserAgent =  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0'

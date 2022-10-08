@@ -3,20 +3,61 @@
 * 提高 Aria2 使用体验的小工具：集成封装 Aria2 和 AriaNg 项目
 * 提供优化的 Aria2 的配置
 * 自动更新 BT 下载使用的 Tracker
+* 支持 Windows 10/11 和 OpenWrt 22.03
 
 # 下载
+
+## Windows 10/11
 
 从如下链接下载最新的版本：`Aria2Tool_版本号.zip`
 
 > https://github.com/dsx42/Aria2Tool/releases
 
+## OpenWrt 22.03
+
+从如下链接下载最新的版本：`aria2_tool_openwrt.sh`
+
+> https://github.com/dsx42/Aria2Tool/releases
+
+
 # 如何使用本工具？
+
+## Windows 10/11
 
 解压下载好的压缩包，双击解压后的 `Aria2Tool.cmd` 即可
 
 > Aria2 占用资源极少，推荐设为开机启动 Aria2，并且创建桌面快捷方式，使用时直接双击 `AriaNg` 快捷方式  
 
 > 升级新版本时，先关闭 Aria2，再解压覆盖旧版本目录
+
+## OpenWrt 22.03
+
+aria2_tool_openwrt.sh 支持如下命令：
+
+```bash
+/bin/sh aria2_tool_openwrt.sh install download_dir download_dir_disk_type
+/bin/sh aria2_tool_openwrt.sh start download_dir download_dir_disk_type
+/bin/sh aria2_tool_openwrt.sh stop
+/bin/sh aria2_tool_openwrt.sh status
+/bin/sh aria2_tool_openwrt.sh reload
+/bin/sh aria2_tool_openwrt.sh auto_reload script_file_path
+```
+
+* `install`：安装 Aria2
+    * `download_dir`：Aria2 保存下载文件的绝对路径，默认为 `/etc/aria2/download/`
+    * `download_dir_disk_type`：Aria2 保存下载文件的路径所属硬盘类型，支持如下值：
+        * `HDD`：机械硬盘，默认值
+        * `SSD`：固态硬盘
+* `start`：启动 Aria2
+    * `download_dir`：Aria2 保存下载文件的路径，默认为 `/etc/aria2/download/`
+    * `download_dir_disk_type`：Aria2 保存下载文件的路径所属硬盘类型，支持如下值：
+        * `HDD`：机械硬盘，默认值
+        * `SSD`：固态硬盘
+* `stop`：关闭 Aria2
+* `status`：Aria2 状态
+* `reload`：更新 Tracker，重启 Aria2
+* `auto_reload`：每 4 小时自动更新 Tracker，重启 Aria2
+    * `script_file_path`：本脚本的绝对路径，包含脚本名
 
 # 常见问题
 
