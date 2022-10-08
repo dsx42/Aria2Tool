@@ -144,7 +144,7 @@ update_tracker() {
 
     i=$((1))
     tracker_all_str=''
-    uci delete aria2.main.bt_tracker
+    uci -q delete aria2.main.bt_tracker
     while [ ${i} -le ${valid_tracker} ]; do
         json_get_var tracker ${i}
         uci add_list aria2.main.bt_tracker="${tracker}"
@@ -172,7 +172,7 @@ config() {
     download_dir_disk_type="${2}"
 
     if [ -z "${download_dir}" ]; then
-        download_dir="$(uci get aria2.main.dir)"
+        download_dir="$(uci -q get aria2.main.dir)"
     fi
     if [ -z "${download_dir}" ]; then
         download_dir='/etc/aria2/download/'
@@ -183,7 +183,7 @@ config() {
         return
     fi
 
-    trackers="$(uci get aria2.main.bt_tracker)"
+    trackers="$(uci -q get aria2.main.bt_tracker)"
 
     mems="$(free)"
     index=$((0))
@@ -216,9 +216,9 @@ config() {
         cache='8'
     fi
 
-    uci delete aria2.main.bt_tracker
-    uci delete aria2.main.extra_settings
-    uci delete aria2.main
+    uci -q delete aria2.main.bt_tracker
+    uci -q delete aria2.main.extra_settings
+    uci -q delete aria2.main
 
     uci set aria2.main=aria2
     uci set aria2.main.enabled='1'

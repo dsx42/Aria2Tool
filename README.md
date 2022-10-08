@@ -19,6 +19,9 @@
 
 > https://github.com/dsx42/Aria2Tool/releases
 
+```bash
+wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/版本号/aria2_tool_openwrt.sh'
+```
 
 # 如何使用本工具？
 
