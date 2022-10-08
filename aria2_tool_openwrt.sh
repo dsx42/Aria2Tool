@@ -220,14 +220,14 @@ config() {
     uci delete aria2.main.extra_settings
     uci delete aria2.main
 
-    uci set aria2.main='aria2'
+    uci set aria2.main=aria2
     uci set aria2.main.enabled='1'
     uci set aria2.main.user='aria2'
     uci set aria2.main.dir="${download_dir}"
     # input-file auto set
     uci set aria2.main.config_dir='/etc/aria2'
-    uci set aria2.main.enable_logging='1'
-    uci set aria2.main.log='/etc/aria2/aria2.log'
+    # aria2.main.enable_logging can't set, if set, aria2 will start fail
+    # aria2.main.log can't set, if set, aria2 will start fail
     uci set aria2.main.max_concurrent_downloads='50'
     # continue auto set
     uci set aria2.main.connect_timeout='10'
@@ -302,7 +302,7 @@ config() {
     fi
     uci set aria2.main.force_save='true'
     uci add_list aria2.main.extra_settings='save-not-found=false'
-    uci set aria2.main.log_level='notice'
+    # aria2.main.log_level can't set, if set, aria2 will start fail
     uci add_list aria2.main.extra_settings='summary-interval=0'
     # save-session auto set
     uci set aria2.main.save_session_interval='20'
@@ -354,7 +354,6 @@ start() {
         return
     fi
 
-    rm -rf '/etc/aria2/aria2.log'
     update_tracker
     config "${download_dir}" "${download_dir_disk_type}"
     service aria2 start
@@ -379,42 +378,18 @@ stop() {
 
     save_session
     shutdown
-
-    retry_count=$((1))
-    while [ ${retry_count} -le 10 ]; do
-        aria2_process="$(service aria2 status | grep 'running')"
-        if [ -z "${aria2_process}" ]; then
-            service aria2 stop
-            echo ''
-            echo 'Aria2 stop success'
-            return
-        fi
-        retry_count=$((retry_count + 1))
-        sleep 3s
-    done
+    sleep 3s
+    service aria2 stop
+    sleep 1s
 
     aria2_process="$(service aria2 status | grep 'running')"
-    if [ -z "${aria2_process}" ]; then
-        service aria2 stop
+    if [ -n "${aria2_process}" ]; then
         echo ''
         echo 'Aria2 stop success'
-        return
-    fi
-
-    force_shutdown
-    sleep 3s
-
-    aria2_process="$(service aria2 status | grep 'running')"
-    if [ -z "${aria2_process}" ]; then
-        service aria2 stop
+    else
         echo ''
-        echo 'Aria2 force stop success'
-        return
+        echo 'Aria2 stop fail'
     fi
-
-    service aria2 stop
-    echo ''
-    echo 'Kill Aria2'
 }
 
 reload() {
