@@ -44,7 +44,7 @@ update_tracker() {
     content="$(opkg list-installed aria2)"
     if [ -z "${content}" ]; then
         echo ''
-        echo 'Aria2 not installed, update Tracker fail'
+        echo 'aria2 not installed, update tracker fail'
         return
     fi
 
@@ -81,14 +81,14 @@ update_tracker() {
 
     for source in $sources; do
         echo ''
-        echo "Tracker source: ${source}"
+        echo "tracker source: ${source}"
 
         content="$(wget -q -T 1 -O - ${source})"
         if [ -z "${content}" ]; then
             content="$(wget -q -T 5 -O - ${github_proxy}/${source})"
         fi
         if [ -z "${content}" ]; then
-            echo "Tracker source invalid: ${source}"
+            echo "tracker source invalid: ${source}"
             continue
         fi
 
@@ -138,7 +138,7 @@ update_tracker() {
     echo "total_tracker: ${total_tracker}, repeat_tracker: ${repeat_tracker}, valid_tracker: ${valid_tracker}"
     if [ ${valid_tracker} -le 0 ]; then
         echo ''
-        echo 'no valid Tracker, update Tracker fail'
+        echo 'no valid tracker, update tracker fail'
         return
     fi
 
@@ -164,7 +164,7 @@ config() {
     content="$(opkg list-installed aria2)"
     if [ -z "${content}" ]; then
         echo ''
-        echo 'Aria2 not installed, Config Aria2 fail'
+        echo 'aria2 not installed, set aria2 config fail'
         return
     fi
 
@@ -179,7 +179,7 @@ config() {
     fi
     if [ ! -d "${download_dir}" ]; then
         echo ''
-        echo 'download_dir not exist, Config Aria2 fail'
+        echo 'download_dir not exist, set aria2 config fail'
         return
     fi
 
@@ -309,7 +309,7 @@ config() {
 
     uci commit aria2
 
-    aria2_process="$(service aria2 status | grep 'running')"
+    aria2_process="$(/etc/init.d/aria2 status | grep 'running')"
     if [ -n "${aria2_process}" ]; then
         save_session
     fi
@@ -326,12 +326,12 @@ install() {
         opkg install aria2
         config "${download_dir}" "${download_dir_disk_type}"
         echo ''
-        echo 'Aria2 install success'
+        echo 'aria2 install success'
         return
     fi
 
     echo ''
-    echo 'Aria2 already installed'
+    echo 'aria2 already installed'
 }
 
 start() {
@@ -342,67 +342,87 @@ start() {
     content="$(opkg list-installed aria2)"
     if [ -z "${content}" ]; then
         echo ''
-        echo 'Aria2 not installed, start Aria2 fail'
+        echo 'aria2 not installed, start aria2 fail'
         return
     fi
 
-    aria2_process="$(service aria2 status | grep 'running')"
+    aria2_process="$(/etc/init.d/aria2 status | grep 'running')"
     if [ -n "${aria2_process}" ]; then
         save_session
         echo ''
-        echo 'Aria2 running'
+        echo 'aria2 running'
         return
     fi
 
     update_tracker
     config "${download_dir}" "${download_dir_disk_type}"
-    service aria2 start
+    /etc/init.d/aria2 start
 
-    aria2_process="$(service aria2 status | grep 'running')"
+    aria2_process="$(/etc/init.d/aria2 status | grep 'running')"
     if [ -n "${aria2_process}" ]; then
         echo ''
-        echo 'Aria2 start success'
+        echo 'aria2 start success'
     else
         echo ''
-        echo 'Aria2 start fail'
+        echo 'aria2 start fail'
     fi
 }
 
 stop() {
-    aria2_process="$(service aria2 status | grep 'running')"
+
+    content="$(opkg list-installed aria2)"
+    if [ -z "${content}" ]; then
+        echo ''
+        echo 'aria2 not installed, no need to stop aria2'
+        return
+    fi
+
+    aria2_process="$(/etc/init.d/aria2 status | grep 'running')"
     if [ -z "${aria2_process}" ]; then
         echo ''
-        echo 'Aria2 not running'
+        echo 'aria2 not running'
         return
     fi
 
     save_session
-    shutdown
+    /etc/init.d/aria2 stop
     sleep 3s
-    service aria2 stop
-    sleep 1s
 
-    aria2_process="$(service aria2 status | grep 'running')"
+    aria2_process="$(/etc/init.d/aria2 status | grep 'running')"
     if [ -n "${aria2_process}" ]; then
         echo ''
-        echo 'Aria2 stop success'
+        echo 'aria2 stop success'
     else
         echo ''
-        echo 'Aria2 stop fail'
+        echo 'aria2 stop fail'
     fi
 }
 
 reload() {
-    stop
-    start
+
+    content="$(opkg list-installed aria2)"
+    if [ -z "${content}" ]; then
+        echo ''
+        echo 'aria2 not installed, can not reload aria2'
+        return
+    fi
+
+    update_tracker
+
+    save_session
+
+    /etc/init.d/aria2 restart
+
+    echo ''
+    echo 'aria2 restart'
 }
 
 enable() {
-    service aria2 enable
+    /etc/init.d/aria2 enable
 }
 
 disable() {
-    service aria2 disable
+    /etc/init.d/aria2 disable
 }
 
 auto_update_tracker() {
@@ -411,16 +431,16 @@ auto_update_tracker() {
 
     if [ ! -e "${script_file_path}" ]; then
         echo ''
-        echo "${script_file_path} not exist, set auto update Tracker fail"
+        echo "${script_file_path} not exist, set auto update tracker fail"
         return
     fi
 
     (
         crontab -l
-        echo "0 4 * * * /bin/sh ${script_file_path} reload"
+        echo "* */4 * * * /bin/sh ${script_file_path} reload"
     ) | uniq | crontab -
 
-    service cron restart
+    /etc/init.d/cron restart
 }
 
 case ${1} in
@@ -434,13 +454,13 @@ case ${1} in
     stop
     ;;
 'status')
-    aria2_process="$(service aria2 status | grep 'running')"
+    aria2_process="$(/etc/init.d/aria2 status | grep 'running')"
     if [ -z "${aria2_process}" ]; then
         echo ''
-        echo 'Aria2 not running'
+        echo 'aria2 not running'
     else
         echo ''
-        echo 'Aria2 running'
+        echo 'aria2 running'
     fi
     ;;
 'reload')
@@ -462,6 +482,8 @@ case ${1} in
     echo 'usage: /bin/sh aria2_tool_openwrt.sh stop'
     echo 'usage: /bin/sh aria2_tool_openwrt.sh status'
     echo 'usage: /bin/sh aria2_tool_openwrt.sh reload'
+    echo 'usage: /bin/sh aria2_tool_openwrt.sh enable'
+    echo 'usage: /bin/sh aria2_tool_openwrt.sh disable'
     echo 'usage: /bin/sh aria2_tool_openwrt.sh auto_reload script_file_path'
     ;;
 esac
