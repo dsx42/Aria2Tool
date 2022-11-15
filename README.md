@@ -3,7 +3,7 @@
 * 提高 Aria2 使用体验的小工具：集成封装 Aria2 和 AriaNg 项目
 * 提供优化的 Aria2 的配置
 * 自动更新 BT 下载使用的 Tracker
-* 支持 Windows 10/11 和 OpenWrt 22.03
+* 支持 Windows 10/11 和 OpenWrt 22.03.2
 
 # 下载
 
@@ -44,6 +44,8 @@ aria2_tool_openwrt.sh 支持如下命令：
 /bin/sh aria2_tool_openwrt.sh status
 /bin/sh aria2_tool_openwrt.sh reload
 /bin/sh aria2_tool_openwrt.sh auto_reload script_file_path
+/bin/sh aria2_tool_openwrt.sh enable
+/bin/sh aria2_tool_openwrt.sh disable
 ```
 
 * `install`：安装 Aria2
@@ -61,6 +63,8 @@ aria2_tool_openwrt.sh 支持如下命令：
 * `reload`：更新 Tracker，重启 Aria2
 * `auto_reload`：每 4 小时自动更新 Tracker，重启 Aria2
     * `script_file_path`：本脚本的绝对路径，包含脚本名
+* `enable`：Aria2 开机自动启动
+* `disable`：取消 Aria2 开机动启动
 
 # 常见问题
 
