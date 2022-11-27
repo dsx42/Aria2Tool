@@ -198,21 +198,21 @@ config() {
             fi
         done
     fi
-    if [ ${free} -gt $((1024 * 4 * 1024)) ]; then
+    if [ ${free} -gt $((1024 * 2 * 1024)) ]; then
         cache='1024'
-    elif [ ${free} -gt $((512 * 4 * 1024)) ]; then
+    elif [ ${free} -gt $((512 * 2 * 1024)) ]; then
         cache='512'
-    elif [ ${free} -gt $((256 * 4 * 1024)) ]; then
+    elif [ ${free} -gt $((256 * 2 * 1024)) ]; then
         cache='256'
-    elif [ ${free} -gt $((128 * 4 * 1024)) ]; then
+    elif [ ${free} -gt $((128 * 2 * 1024)) ]; then
         cache='128'
-    elif [ ${free} -gt $((64 * 4 * 1024)) ]; then
+    elif [ ${free} -gt $((64 * 2 * 1024)) ]; then
         cache='64'
-    elif [ ${free} -gt $((32 * 4 * 1024)) ]; then
+    elif [ ${free} -gt $((32 * 2 * 1024)) ]; then
         cache='32'
-    elif [ ${free} -gt $((16 * 4 * 1024)) ]; then
+    elif [ ${free} -gt $((16 * 2 * 1024)) ]; then
         cache='16'
-    elif [ ${free} -gt $((8 * 4 * 1024)) ]; then
+    elif [ ${free} -gt $((8 * 2 * 1024)) ]; then
         cache='8'
     fi
 
