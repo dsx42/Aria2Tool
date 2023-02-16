@@ -3,7 +3,7 @@
 * 提高 Aria2 使用体验的小工具：集成封装 Aria2 和 AriaNg 项目
 * 提供优化的 Aria2 的配置
 * 自动更新 BT 下载使用的 Tracker
-* 支持 Windows 10/11 和 OpenWrt 22.03.2
+* 支持 Windows 10/11 和 OpenWrt 22.03.3
 
 # 下载
 
