@@ -9,7 +9,7 @@
 
 ## Windows 10/11
 
-从如下链接下载最新的版本：`Aria2Tool_版本号.zip`
+从如下链接下载最新的版本：`Aria2Tool_v2023.2.16.zip`
 
 > https://github.com/dsx42/Aria2Tool/releases
 
@@ -20,7 +20,7 @@
 > https://github.com/dsx42/Aria2Tool/releases
 
 ```bash
-wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/版本号/aria2_tool_openwrt.sh'
+wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2023.2.16/aria2_tool_openwrt.sh'
 ```
 
 # 如何使用本工具？
