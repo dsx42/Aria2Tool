@@ -9,31 +9,49 @@
 
 ## Windows 10/11
 
-从如下链接下载最新的版本：`Aria2Tool_v2023.2.16.zip`
+从如下链接下载最新的版本：`Aria2Tool_v2023.2.17.zip`
 
 > https://github.com/dsx42/Aria2Tool/releases
 
-## OpenWrt 22.03
+## OpenWrt 22.03.3
 
 从如下链接下载最新的版本：`aria2_tool_openwrt.sh`
 
 > https://github.com/dsx42/Aria2Tool/releases
 
 ```bash
-wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2023.2.16/aria2_tool_openwrt.sh'
+wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2023.2.17/aria2_tool_openwrt.sh'
 ```
 
 # 如何使用本工具？
 
 ## Windows 10/11
 
-解压下载好的压缩包，双击解压后的 `Aria2Tool.cmd` 即可
+解压下载好的压缩包，双击解压后的 `Aria2Tool.cmd`，根据提示操作即可
 
-> Aria2 占用资源极少，推荐设为开机启动 Aria2，并且创建桌面快捷方式，使用时直接双击 `AriaNg` 快捷方式  
+* Aria2 占用资源极少，推荐设为开机启动 Aria2，并且创建桌面快捷方式，使用时直接双击 `AriaNg` 快捷方式  
+* 升级新版本时，先关闭 Aria2，再解压覆盖旧版本目录
 
-> 升级新版本时，先关闭 Aria2，再解压覆盖旧版本目录
+## OpenWrt 22.03.3
 
-## OpenWrt 22.03
+RPC 端口为 6800，未设置 RPC 密钥，示例如下：
+
+```bash
+# 建立 Aria2 配置文件目录
+mkdir -p /etc/aria2
+# 建立 Aria2 下载文件目录
+mkdir -p /mnt/sda/download
+# 下载 Aria2 脚本到 Aria2 配置文件目录
+wget -O /etc/aria2/aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2023.2.17/aria2_tool_openwrt.sh'
+# 安装 Aria2，并指定下载文件目录
+/bin/sh /etc/aria2/aria2_tool_openwrt.sh install '/mnt/sda/download'
+# Aria2 设为开机启动
+/bin/sh /etc/aria2/aria2_tool_openwrt.sh enable
+# Aira2 定时自动更新 Tracker
+/bin/sh /etc/aria2/aria2_tool_openwrt.sh auto_reload '/etc/aria2/aria2_tool_openwrt.sh'
+# 设置 aria2 用户为下载文件目录所有者
+chown -R aria2 '/mnt/sda/download'
+```
 
 aria2_tool_openwrt.sh 支持如下命令：
 
