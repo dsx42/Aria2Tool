@@ -239,14 +239,14 @@ function WriteAria2Config {
     $CookiesPath = ''
     if ($Browser -ieq 'Chrome') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/110.0.0.0 Safari/537.36'
+            + 'Chrome/111.0.0.0 Safari/537.36'
     }
     elseif ($Browser -ieq 'Edge') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.46'
+            + 'Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.44'
     }
     elseif ($Browser -ieq 'Firefox') {
-        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0'
+        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/111.0'
         if (Test-Path -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -PathType Container) {
             $Directorys = Get-ChildItem -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -Force -Directory
             if ($null -ne $Directorys -and $Directorys.Length -gt 0) {
