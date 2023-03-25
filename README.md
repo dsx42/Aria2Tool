@@ -9,7 +9,7 @@
 
 ## Windows 10/11
 
-从如下链接下载最新的版本：`Aria2Tool_v2023.3.19.zip`
+从如下链接下载最新的版本：`Aria2Tool_v2023.3.25.zip`
 
 > https://github.com/dsx42/Aria2Tool/releases
 
@@ -20,7 +20,7 @@
 > https://github.com/dsx42/Aria2Tool/releases
 
 ```bash
-wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2023.3.19/aria2_tool_openwrt.sh'
+wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2023.3.25/aria2_tool_openwrt.sh'
 ```
 
 # 如何使用本工具？
@@ -42,7 +42,7 @@ mkdir -p /etc/aria2
 # 建立 Aria2 下载文件目录
 mkdir -p /mnt/sda/download
 # 下载 Aria2 脚本到 Aria2 配置文件目录
-wget -O /etc/aria2/aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2023.3.19/aria2_tool_openwrt.sh'
+wget -O /etc/aria2/aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2023.3.25/aria2_tool_openwrt.sh'
 # 安装 Aria2，并指定下载文件目录
 /bin/sh /etc/aria2/aria2_tool_openwrt.sh install '/mnt/sda/download'
 # Aria2 设为开机启动

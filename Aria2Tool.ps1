@@ -275,7 +275,6 @@ function WriteAria2Config {
         'continue'                         = 'true';
         'connect-timeout'                  = '10';
         'max-connection-per-server'        = '16';
-        'max-file-not-found'               = '10';
         'max-tries'                        = '0';
         'min-split-size'                   = '4M';
         'netrc-path'                       = "$PSScriptRoot\.netrc";

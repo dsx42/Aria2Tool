@@ -232,7 +232,6 @@ config() {
     # continue auto set
     uci set aria2.main.connect_timeout='10'
     uci set aria2.main.max_connection_per_server='16'
-    uci add_list aria2.main.extra_settings='max-file-not-found=10'
     uci set aria2.main.max_tries='0'
     uci set aria2.main.min_split_size='4M'
     uci add_list aria2.main.extra_settings='netrc-path=/etc/aria2/.netrc'
