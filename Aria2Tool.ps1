@@ -235,18 +235,18 @@ function WriteAria2Config {
     }
 
     $Browser = GetDefaultBrowser
-    $UserAgent = 'Transmission/4.0.0'
+    $UserAgent = 'Transmission/4.0.3'
     $CookiesPath = ''
     if ($Browser -ieq 'Chrome') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/111.0.0.0 Safari/537.36'
+            + 'Chrome/112.0.0.0 Safari/537.36'
     }
     elseif ($Browser -ieq 'Edge') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.44'
+            + 'Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.46'
     }
     elseif ($Browser -ieq 'Firefox') {
-        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/111.0'
+        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0'
         if (Test-Path -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -PathType Container) {
             $Directorys = Get-ChildItem -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -Force -Directory
             if ($null -ne $Directorys -and $Directorys.Length -gt 0) {
@@ -309,8 +309,8 @@ function WriteAria2Config {
         'enable-dht6'                      = 'true';
         'follow-torrent'                   = 'false';
         'listen-port'                      = '51413';
-        'peer-id-prefix'                   = '-TR4000-';
-        'peer-agent'                       = 'Transmission/4.0.0';
+        'peer-id-prefix'                   = '-TR4030-';
+        'peer-agent'                       = 'Transmission/4.0.3';
         'enable-rpc'                       = 'true';
         'rpc-allow-origin-all'             = 'true';
         'rpc-listen-all'                   = 'true';
