@@ -1,1 +1,1 @@
-PowerShell -NoProfile -ExecutionPolicy RemoteSigned -File "%~dp0Aria2Tool.ps1"
+PowerShell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Aria2Tool.ps1"

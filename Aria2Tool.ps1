@@ -23,7 +23,7 @@ function RequireAdmin {
             }
         }
         Start-Process -FilePath PowerShell.exe -ArgumentList `
-            "-NoProfile -ExecutionPolicy RemoteSigned -File `"$ScriptFile`"$ScriptParams" -Verb RunAs `
+            "-NoProfile -ExecutionPolicy Bypass -File `"$ScriptFile`"$ScriptParams" -Verb RunAs `
             -WindowStyle Normal
         [System.Environment]::Exit(0)
     }
@@ -239,14 +239,14 @@ function WriteAria2Config {
     $CookiesPath = ''
     if ($Browser -ieq 'Chrome') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/112.0.0.0 Safari/537.36'
+            + 'Chrome/113.0.0.0 Safari/537.36'
     }
     elseif ($Browser -ieq 'Edge') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.46'
+            + 'Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.50'
     }
     elseif ($Browser -ieq 'Firefox') {
-        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0'
+        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0'
         if (Test-Path -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -PathType Container) {
             $Directorys = Get-ChildItem -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -Force -Directory
             if ($null -ne $Directorys -and $Directorys.Length -gt 0) {
@@ -652,7 +652,7 @@ function AutoUpdateBtTrackerByAria2Tool {
             return
         }
 
-        PowerShell -NoProfile -ExecutionPolicy RemoteSigned -File "$Path\Aria2Tool.ps1" -UpdateTracker
+        PowerShell -NoProfile -ExecutionPolicy Bypass -File "$Path\Aria2Tool.ps1" -UpdateTracker
     } -Name 'AutoUpdateBtTrackerByAria2Tool' -ScheduledJobOption $JobOption -ArgumentList "$PSScriptRoot" -RunNow `
         -RunEvery $TimeSpan | Out-Null
 }
@@ -832,7 +832,7 @@ function AutoStart {
             return
         }
 
-        PowerShell -NoProfile -ExecutionPolicy RemoteSigned -File "$Path\Aria2Tool.ps1" -StartAria2
+        PowerShell -NoProfile -ExecutionPolicy Bypass -File "$Path\Aria2Tool.ps1" -StartAria2
     } -Name 'AutoStartAria2ByAria2Tool' -Trigger $JobTrigger -ScheduledJobOption $ScheduledJobOption `
         -ArgumentList "$PSScriptRoot" | Out-Null
 
