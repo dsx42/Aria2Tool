@@ -361,7 +361,7 @@ function WriteAria2Config {
 
 function GetTrackers {
 
-    $GithubProxy = 'https://ghproxy.com'
+    $GithubProxy = 'https://mirror.ghproxy.com'
 
     $UrlArray = @(
         'https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt',

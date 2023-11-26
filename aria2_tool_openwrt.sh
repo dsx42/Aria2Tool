@@ -48,7 +48,7 @@ update_tracker() {
         return
     fi
 
-    github_proxy='https://ghproxy.com'
+    github_proxy='https://mirror.ghproxy.com'
 
     sources='
         https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt
