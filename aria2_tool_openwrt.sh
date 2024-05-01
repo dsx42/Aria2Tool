@@ -85,10 +85,10 @@ update_tracker() {
 
         content="$(wget -q -T 1 -O - ${source})"
         if [ -z "${content}" ]; then
-            content="$(wget -q -T 5 -O - ${github_proxy}/${source})"
+            content="$(wget -q -T 2 -O - ${github_proxy}/${source})"
         fi
         if [ -z "${content}" ]; then
-            echo "tracker source invalid: ${source}"
+            echo "tracker source invalid: ${github_proxy}/${source}"
             continue
         fi
 
@@ -242,7 +242,7 @@ config() {
     uci add_list aria2.main.extra_settings='stream-piece-selector=geom'
     uci set aria2.main.timeout='10'
     uci set aria2.main.http_accept_gzip='true'
-    uci set aria2.main.user_agent='Transmission/4.0.4'
+    uci set aria2.main.user_agent='Transmission/4.0.5'
     uci set aria2.main.bt_detach_seed_only='true'
     uci set aria2.main.bt_enable_lpd='true'
     uci add_list aria2.main.extra_settings='bt-force-encryption=true'
@@ -273,9 +273,9 @@ config() {
     uci set aria2.main.enable_dht6='true'
     uci set aria2.main.follow_torrent='false'
     uci set aria2.main.listen_port='51413'
-    uci set aria2.main.peer_id_prefix='-TR4040-'
-    uci add_list aria2.main.extra_settings='peer-agent=Transmission/4.0.4'
-    uci set aria2.main.seed_ratio='0'
+    uci set aria2.main.peer_id_prefix='-TR4050-'
+    uci add_list aria2.main.extra_settings='peer-agent=Transmission/4.0.5'
+    uci set aria2.main.seed_ratio='1'
     # enable-rpc auto set
     # rpc-allow-origin-all auto set
     # rpc-listen-all auto set
@@ -413,6 +413,22 @@ reload() {
     /etc/init.d/aria2 restart
 
     echo ''
+    echo 'aria2 reload'
+}
+
+restart() {
+    content="$(opkg list-installed aria2)"
+    if [ -z "${content}" ]; then
+        echo ''
+        echo 'aria2 not installed, can not restart aria2'
+        return
+    fi
+
+    save_session
+
+    /etc/init.d/aria2 restart
+
+    echo ''
     echo 'aria2 restart'
 }
 
@@ -465,6 +481,9 @@ case ${1} in
 'reload')
     reload
     ;;
+'restart')
+    restart
+    ;;
 'enable')
     enable
     ;;
@@ -481,6 +500,7 @@ case ${1} in
     echo 'usage: /bin/sh aria2_tool_openwrt.sh stop'
     echo 'usage: /bin/sh aria2_tool_openwrt.sh status'
     echo 'usage: /bin/sh aria2_tool_openwrt.sh reload'
+    echo 'usage: /bin/sh aria2_tool_openwrt.sh restart'
     echo 'usage: /bin/sh aria2_tool_openwrt.sh enable'
     echo 'usage: /bin/sh aria2_tool_openwrt.sh disable'
     echo 'usage: /bin/sh aria2_tool_openwrt.sh auto_reload script_file_path'

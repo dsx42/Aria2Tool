@@ -235,18 +235,18 @@ function WriteAria2Config {
     }
 
     $Browser = GetDefaultBrowser
-    $UserAgent = 'Transmission/4.0.4'
+    $UserAgent = 'Transmission/4.0.5'
     $CookiesPath = ''
     if ($Browser -ieq 'Chrome') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/119.0.0.0 Safari/537.36'
+            + 'Chrome/124.0.0.0 Safari/537.36'
     }
     elseif ($Browser -ieq 'Edge') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0'
+            + 'Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0'
     }
     elseif ($Browser -ieq 'Firefox') {
-        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0'
+        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/125.0'
         if (Test-Path -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -PathType Container) {
             $Directorys = Get-ChildItem -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -Force -Directory
             if ($null -ne $Directorys -and $Directorys.Length -gt 0) {
@@ -309,8 +309,8 @@ function WriteAria2Config {
         'enable-dht6'                      = 'true';
         'follow-torrent'                   = 'false';
         'listen-port'                      = '51413';
-        'peer-id-prefix'                   = '-TR4040-';
-        'peer-agent'                       = 'Transmission/4.0.4';
+        'peer-id-prefix'                   = '-TR4050-';
+        'peer-agent'                       = 'Transmission/4.0.5';
         'enable-rpc'                       = 'true';
         'rpc-allow-origin-all'             = 'true';
         'rpc-listen-all'                   = 'true';
@@ -402,13 +402,13 @@ function GetTrackers {
         }
         if ([System.String]::IsNullOrEmpty($Content)) {
             try {
-                $Content = Invoke-RestMethod -Method Get -Uri "$GithubProxy/$Url" -TimeoutSec 5
+                $Content = Invoke-RestMethod -Method Get -Uri "$GithubProxy/$Url" -TimeoutSec 2
             }
             catch {
                 $Content = $null
             }
             if ([System.String]::IsNullOrEmpty($Content)) {
-                Write-Host -Object "Tracker 来源: $Url 请求失败" -ForegroundColor Red
+                Write-Host -Object "Tracker 来源: $GithubProxy/$Url 请求失败" -ForegroundColor Red
                 continue
             }
         }
