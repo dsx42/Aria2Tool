@@ -48,7 +48,7 @@ update_tracker() {
         return
     fi
 
-    github_proxy='https://mirror.ghproxy.com'
+    github_proxy='https://ghp.ci'
 
     sources='
         https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt
@@ -242,7 +242,7 @@ config() {
     uci add_list aria2.main.extra_settings='stream-piece-selector=geom'
     uci set aria2.main.timeout='10'
     uci set aria2.main.http_accept_gzip='true'
-    uci set aria2.main.user_agent='Transmission/4.0.5'
+    uci set aria2.main.user_agent='Transmission/4.0.6'
     uci set aria2.main.bt_detach_seed_only='true'
     uci set aria2.main.bt_enable_lpd='true'
     uci add_list aria2.main.extra_settings='bt-force-encryption=true'
@@ -274,7 +274,7 @@ config() {
     uci set aria2.main.follow_torrent='false'
     uci set aria2.main.listen_port='51413'
     uci set aria2.main.peer_id_prefix='-TR4050-'
-    uci add_list aria2.main.extra_settings='peer-agent=Transmission/4.0.5'
+    uci add_list aria2.main.extra_settings='peer-agent=Transmission/4.0.6'
     uci set aria2.main.seed_ratio='1'
     # enable-rpc auto set
     # rpc-allow-origin-all auto set

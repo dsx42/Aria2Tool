@@ -235,18 +235,18 @@ function WriteAria2Config {
     }
 
     $Browser = GetDefaultBrowser
-    $UserAgent = 'Transmission/4.0.5'
+    $UserAgent = 'Transmission/4.0.6'
     $CookiesPath = ''
     if ($Browser -ieq 'Chrome') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/124.0.0.0 Safari/537.36'
+            + 'Chrome/129.0.0.0 Safari/537.36'
     }
     elseif ($Browser -ieq 'Edge') {
         $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' `
-            + 'Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0'
+            + 'Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0'
     }
     elseif ($Browser -ieq 'Firefox') {
-        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/125.0'
+        $UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0'
         if (Test-Path -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -PathType Container) {
             $Directorys = Get-ChildItem -Path "${env:APPDATA}\Mozilla\Firefox\Profiles" -Force -Directory
             if ($null -ne $Directorys -and $Directorys.Length -gt 0) {
@@ -310,7 +310,7 @@ function WriteAria2Config {
         'follow-torrent'                   = 'false';
         'listen-port'                      = '51413';
         'peer-id-prefix'                   = '-TR4050-';
-        'peer-agent'                       = 'Transmission/4.0.5';
+        'peer-agent'                       = 'Transmission/4.0.6';
         'enable-rpc'                       = 'true';
         'rpc-allow-origin-all'             = 'true';
         'rpc-listen-all'                   = 'true';
@@ -361,7 +361,7 @@ function WriteAria2Config {
 
 function GetTrackers {
 
-    $GithubProxy = 'https://mirror.ghproxy.com'
+    $GithubProxy = 'https://ghp.ci'
 
     $UrlArray = @(
         'https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt',
