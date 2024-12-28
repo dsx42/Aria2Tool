@@ -273,7 +273,7 @@ config() {
     uci set aria2.main.enable_dht6='true'
     uci set aria2.main.follow_torrent='false'
     uci set aria2.main.listen_port='51413'
-    uci set aria2.main.peer_id_prefix='-TR4050-'
+    uci set aria2.main.peer_id_prefix='-TR4060-'
     uci add_list aria2.main.extra_settings='peer-agent=Transmission/4.0.6'
     uci set aria2.main.seed_ratio='1'
     # enable-rpc auto set
