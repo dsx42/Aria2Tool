@@ -361,7 +361,7 @@ function WriteAria2Config {
 
 function GetTrackers {
 
-    $GithubProxy = 'https://ghp.ci'
+    $GithubProxy = 'https://ghgo.xyz'
 
     $UrlArray = @(
         'https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt',
