@@ -3,15 +3,31 @@
 * 提高 Aria2 使用体验的小工具：集成封装 Aria2 和 AriaNg 项目
 * 提供优化的 Aria2 的配置
 * 自动更新 BT 下载使用的 Tracker
-* 支持 Windows 10/11 和 OpenWrt 23.05.5
+* 支持 Windows 10/11、OpenWrt 23.05.5、x86_64 架构的 Linux，如 Debian 12.8.0
 
 # 下载
 
 ## Windows 10/11
 
-从如下链接下载最新的版本：`Aria2Tool_v2024.12.28.zip`
+从如下链接下载最新的版本：`Aria2Tool_v2025.1.4.zip`
 
 > https://github.com/dsx42/Aria2Tool/releases
+
+## x86_64 Linux
+
+系统需要支持 `systemd`，且需要预先安装如下软件：
+
+* `ca-certificates`：HTTPS 支持
+* `wget`：发起网络请求
+* `zip`：解压缩
+
+从如下链接下载最新的版本：`aria2-x86_64-linux_v2025.1.4.zip`
+
+> https://github.com/dsx42/Aria2Tool/releases
+
+```bash
+wget -p '/opt' 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.4/aria2-x86_64-linux_v2025.1.4.zip'
+```
 
 ## OpenWrt 23.05.5
 
@@ -20,7 +36,7 @@
 > https://github.com/dsx42/Aria2Tool/releases
 
 ```bash
-wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2024.12.28/aria2_tool_openwrt.sh'
+wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.4/aria2_tool_openwrt.sh'
 ```
 
 # 如何使用本工具？
@@ -32,6 +48,51 @@ wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/down
 * Aria2 占用资源极少，推荐设为开机启动 Aria2，并且创建桌面快捷方式，使用时直接双击 `AriaNg` 快捷方式  
 * 升级新版本时，先关闭 Aria2，再解压覆盖旧版本目录
 
+## x86_64 Linux
+
+RPC 端口为 6800，未设置 RPC 密钥，示例如下：
+
+```bash
+# 下载
+wget -p /opt 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.4/aria2-x86_64-linux_v2025.1.4.zip'
+# 解压
+unzip /oppt/aria2-x86_64-linux_v2025.1.4.zip -d /opt
+# 安装并指定下载目录
+/usr/bin/env bash /oppt/aria2/aria2_tool.sh install /mnt/usb/download
+# 设为开机启动
+systemctl enable aria2
+# 启动 aria2
+systemctl start aria2
+# 更新 tracker，不会重启 aria2 进程
+systemctl reload aria2
+```
+
+aria2_tool_openwrt.sh 支持如下命令：
+
+```bash
+/usr/bin/env bash aria2_tool.sh install download_dir
+/usr/bin/env bash aria2_tool.sh uninstall
+```
+
+* `install`：安装 Aria2
+    * `download_dir`：Aria2 保存下载文件的绝对路径，默认为该脚本所在目录下的子目录 `download/`
+* `uninstall`：卸载 Aira2
+
+aria2 通过 `systemctl` 命令管理：
+
+```bash
+# 设为开机启动
+systemctl enable aria2
+# 禁止开机启动
+systemctl disable aria2
+# 更新 tracker，不会重启 aria2 进程
+systemctl reload aria2
+# 重启 aria2
+systemctl restart aria2
+# 查看 aria2 的状态
+systemctl status aria2
+```
+
 ## OpenWrt 23.05.5
 
 RPC 端口为 6800，未设置 RPC 密钥，示例如下：
@@ -42,7 +103,7 @@ mkdir -p /etc/aria2
 # 建立 Aria2 下载文件目录
 mkdir -p /mnt/sda/download
 # 下载 Aria2 脚本到 Aria2 配置文件目录
-wget -O /etc/aria2/aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2024.12.28/aria2_tool_openwrt.sh'
+wget -O /etc/aria2/aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.4/aria2_tool_openwrt.sh'
 # 安装 Aria2，并指定下载文件目录
 /bin/sh /etc/aria2/aria2_tool_openwrt.sh install '/mnt/sda/download'
 # Aria2 设为开机启动
@@ -101,8 +162,13 @@ aria2_tool_openwrt.sh 支持如下命令：
 
 ## aria2c.exe
 
-* 本工具使用的 `aria2c.exe` 用于提供下载能力
-* 提取自 Aria2 项目：https://github.com/aria2/aria2/releases
+* 本工具使用的 `aria2c.exe` 用于提供 Windows 系统的下载能力
+* 提取自 aria2 项目：https://github.com/aria2/aria2/releases
+
+## aria2c
+
+* 本工具使用的 `aria2c` 用于提供 Linux 系统的下载能力
+* 提取自 aria2-static-build 项目：https://github.com/abcfy2/aria2-static-build/releases
 
 ## index.html
 

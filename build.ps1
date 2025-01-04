@@ -58,24 +58,42 @@ if (Test-Path -Path "$OutputPath" -PathType Container) {
 
 New-Item -Path "$OutputProjectPath" -ItemType Directory -Force | Out-Null
 
+New-Item -Path "$OutputPath\aria2" -ItemType Directory -Force | Out-Null
+
 Copy-Item -Path $CopyFiles -Destination "$OutputProjectPath" -Force -Recurse
+
 Copy-Item -Path "$PSScriptRoot\aria2_tool_openwrt.sh" -Destination "$OutputPath\aria2_tool_openwrt.sh" -Force
+
+Copy-Item -Path "$PSScriptRoot\aria2_tool.sh" -Destination "$OutputPath\aria2\aria2_tool.sh" -Force
+Copy-Item -Path "$PSScriptRoot\aria2c" -Destination "$OutputPath\aria2\aria2c" -Force
 
 Compress-Archive -Path "$OutputProjectPath" -DestinationPath "$ZipFilePath" -Force
 
+Compress-Archive -Path "$OutputPath\aria2" -DestinationPath "$OutputPath\aria2-x86_64-linux_v$Version.zip" -Force
+
 $Hash = Get-FileHash -Path "$ZipFilePath" -Algorithm SHA256
+
 $OpenwrtHash = Get-FileHash -Path "$OutputPath\aria2_tool_openwrt.sh" -Algorithm SHA256
 
+$LinuxHash = Get-FileHash -Path "$OutputPath\aria2-x86_64-linux_v$Version.zip" -Algorithm SHA256
+
 $Checksum = $Hash.Hash + " $OutputFileName.zip"
+$LinuxChecksum = $LinuxHash.Hash + " aria2-x86_64-linux_v$Version.zip"
 $OpenwrtChecksum = $OpenwrtHash.Hash + ' aria2_tool_openwrt.sh'
 
 Add-Content -Path "$Sha256FilePath" -Value $Checksum
+Add-Content -Path "$Sha256FilePath" -Value $LinuxChecksum
 Add-Content -Path "$Sha256FilePath" -Value $OpenwrtChecksum
 
 Write-Host -Object ''
 Write-Host -Object ('Path: ' + $Hash.Path)
 Write-Host -Object ''
 Write-Host -Object ('SHA256: ' + $Hash.Hash)
+Write-Host -Object ''
+Write-Host -Object ''
+Write-Host -Object ('Path: ' + $LinuxHash.Path)
+Write-Host -Object ''
+Write-Host -Object ('SHA256: ' + $LinuxHash.Hash)
 Write-Host -Object ''
 Write-Host -Object ''
 Write-Host -Object ('Path: ' + $OpenwrtHash.Path)
