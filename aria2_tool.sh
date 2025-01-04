@@ -53,19 +53,21 @@ function save_session() {
 
     local param="$(
         cat <<-EOL
-	{
-		"jsonrpc": "2.0",
-		"method": "aria2.saveSession",
-		"id": "aria2_tool"
-	}
-	EOL
+    {
+        "jsonrpc": "2.0",
+        "method": "aria2.saveSession",
+        "id": "aria2_tool"
+    }
+    EOL
     )"
 
     local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.saveSession fail'
+        return 1
     else
         echo 'call aria2.saveSession success'
+        return 0
     fi
 }
 
@@ -73,19 +75,21 @@ function shutdown() {
 
     local param="$(
         cat <<-EOL
-	{
-		"jsonrpc": "2.0",
-		"method": "aria2.shutdown",
-		"id": "aria2_tool"
-	}
-	EOL
+    {
+        "jsonrpc": "2.0",
+        "method": "aria2.shutdown",
+        "id": "aria2_tool"
+    }
+    EOL
     )"
 
     local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.shutdown fail'
+        return 1
     else
         echo 'call aria2.shutdown success'
+        return 0
     fi
 }
 
@@ -93,19 +97,21 @@ function force_shutdown() {
 
     local param="$(
         cat <<-EOL
-	{
-		"jsonrpc": "2.0",
-		"method": "aria2.forceShutdown",
-		"id": "aria2_tool"
-	}
-	EOL
+    {
+        "jsonrpc": "2.0",
+        "method": "aria2.forceShutdown",
+        "id": "aria2_tool"
+    }
+    EOL
     )"
 
     local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.forceShutdown fail'
+        return 1
     else
         echo 'call aria2.forceShutdown success'
+        return 0
     fi
 }
 
@@ -115,24 +121,26 @@ function change_tracker() {
 
     local param="$(
         cat <<-EOL
-	{
-		"jsonrpc": "2.0",
-		"method": "aria2.changeGlobalOption",
-		"id": "aria2_tool",
-		"params": [
-			{
-				"bt-tracker": "${trackers}"
-			}
-		]
-	}
-	EOL
+    {
+        "jsonrpc": "2.0",
+        "method": "aria2.changeGlobalOption",
+        "id": "aria2_tool",
+        "params": [
+            {
+                "bt-tracker": "${trackers}"
+            }
+        ]
+    }
+    EOL
     )"
 
     local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.changeGlobalOption fail'
+        return 1
     else
         echo 'call aria2.changeGlobalOption success'
+        return 0
     fi
 }
 
@@ -234,68 +242,68 @@ function config() {
     fi
 
     cat <<-EOL >"${CONF_PATH}"
-	dir=${download_dir}
-	input-file=${SESSION_PATH}
-	log=${LOG_PATH}
-	max-concurrent-downloads=50
-	continue=true
-	connect-timeout=10
-	max-connection-per-server=16
-	max-tries=0
-	min-split-size=4M
-	netrc-path=${BASE_DIR}/.netrc
-	retry-wait=10
-	server-stat-of=${BASE_DIR}/server.status
-	server-stat-if=${BASE_DIR}/server.status
-	split=16
-	stream-piece-selector=geom
-	timeout=10
-	http-accept-gzip=true
-	user-agent=${USER_AGENT}
-	bt-detach-seed-only=true
-	bt-enable-lpd=true
-	bt-force-encryption=true
-	bt-load-saved-metadata=true
-	bt-max-peers=128
-	bt-min-crypto-level=arc4
-	bt-prioritize-piece=head
-	bt-remove-unselected-file=true
-	bt-require-crypto=true
-	bt-request-peer-speed-limit=5
-	bt-save-metadata=true
-	bt-tracker=${trackers}
-	bt-tracker-connect-timeout=10
-	bt-tracker-timeout=10
-	dht-entry-point=dht.transmissionbt.com:6881
-	dht-entry-point6=dht.transmissionbt.com:6881
-	dht-file-path=${BASE_DIR}/dht.dat
-	dht-file-path6=${BASE_DIR}/dht6.dat
-	dht-listen-port=51413
-	enable-dht6=true
-	follow-torrent=false
-	listen-port=51413
-	peer-id-prefix=${PEER_ID_PREFIX}
-	peer-agent=${USER_AGENT}
-	enable-rpc=true
-	rpc-allow-origin-all=true
-	rpc-listen-all=true
-	rpc-max-request-size=10M
-	allow-piece-length-change=true
-	always-resume=false
-	auto-save-interval=20
-	conf-path=${CONF_PATH}
-	content-disposition-default-utf8=true
-	daemon=true
-	disk-cache=${cache}M
-	enable-mmap=${enable_mmap}
-	file-allocation=${file_allocation}
-	force-save=true
-	save-not-found=false
-	log-level=notice
-	summary-interval=0
-	save-session=${SESSION_PATH}
-	save-session-interval=20
-	EOL
+    dir=${download_dir}
+    input-file=${SESSION_PATH}
+    log=${LOG_PATH}
+    max-concurrent-downloads=50
+    continue=true
+    connect-timeout=10
+    max-connection-per-server=16
+    max-tries=0
+    min-split-size=4M
+    netrc-path=${BASE_DIR}/.netrc
+    retry-wait=10
+    server-stat-of=${BASE_DIR}/server.status
+    server-stat-if=${BASE_DIR}/server.status
+    split=16
+    stream-piece-selector=geom
+    timeout=10
+    http-accept-gzip=true
+    user-agent=${USER_AGENT}
+    bt-detach-seed-only=true
+    bt-enable-lpd=true
+    bt-force-encryption=true
+    bt-load-saved-metadata=true
+    bt-max-peers=128
+    bt-min-crypto-level=arc4
+    bt-prioritize-piece=head
+    bt-remove-unselected-file=true
+    bt-require-crypto=true
+    bt-request-peer-speed-limit=5
+    bt-save-metadata=true
+    bt-tracker=${trackers}
+    bt-tracker-connect-timeout=10
+    bt-tracker-timeout=10
+    dht-entry-point=dht.transmissionbt.com:6881
+    dht-entry-point6=dht.transmissionbt.com:6881
+    dht-file-path=${BASE_DIR}/dht.dat
+    dht-file-path6=${BASE_DIR}/dht6.dat
+    dht-listen-port=51413
+    enable-dht6=true
+    follow-torrent=false
+    listen-port=51413
+    peer-id-prefix=${PEER_ID_PREFIX}
+    peer-agent=${USER_AGENT}
+    enable-rpc=true
+    rpc-allow-origin-all=true
+    rpc-listen-all=true
+    rpc-max-request-size=10M
+    allow-piece-length-change=true
+    always-resume=false
+    auto-save-interval=20
+    conf-path=${CONF_PATH}
+    content-disposition-default-utf8=true
+    daemon=true
+    disk-cache=${cache}M
+    enable-mmap=${enable_mmap}
+    file-allocation=${file_allocation}
+    force-save=true
+    save-not-found=false
+    log-level=notice
+    summary-interval=0
+    save-session=${SESSION_PATH}
+    save-session-interval=20
+    EOL
 }
 
 function install() {
@@ -325,22 +333,22 @@ function install() {
 
     # 创建服务文件
     cat <<-EOL >"${SERVICE_PATH}"
-	[Unit]
-	Description=aria2
-	After=network.target
+    [Unit]
+    Description=aria2
+    After=network.target
 
-	[Service]
-	Type=forking
-	ExecStart=/usr/bin/env bash ${SCRIPT_PATH} start
-	ExecReload=/usr/bin/env bash ${SCRIPT_PATH} reload
-	ExecStop=/usr/bin/env bash ${SCRIPT_PATH} stop
-	RestartSec=1
+    [Service]
+    Type=forking
+    ExecStart=/usr/bin/env bash ${SCRIPT_PATH} start
+    ExecReload=/usr/bin/env bash ${SCRIPT_PATH} reload
+    ExecStop=/usr/bin/env bash ${SCRIPT_PATH} stop
+    RestartSec=1
     TimeoutSec=0
-	Restart=on-failure
+    Restart=on-failure
 
-	[Install]
-	WantedBy=multi-user.target
-	EOL
+    [Install]
+    WantedBy=multi-user.target
+    EOL
 
     if [ $? != 0 ]; then
         echo "${SERVICE_PATH} create fail, please try again"
@@ -365,7 +373,7 @@ function auto_reload() {
 
     (
         crontab -l
-        echo "* */4 * * * systemctl reload aria2"
+        echo "* */4 * * * /bin/systemctl reload aria2"
     ) | uniq | crontab -
 
     systemctl restart cron
@@ -374,7 +382,7 @@ function auto_reload() {
 function disable_auto_reload() {
 
     # 删除定时更新任务
-    crontab -l | grep -v "systemctl reload aria2" | crontab -
+    crontab -l | grep -v "/bin/systemctl reload aria2" | crontab -
 
     systemctl restart cron
 }
