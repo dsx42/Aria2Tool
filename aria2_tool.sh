@@ -371,6 +371,8 @@ function uninstall() {
 
     # 删除服务文件
     rm -rf "${SERVICE_PATH}"
+    # 删除日志文件
+    rm -rf "${LOG_PATH}"
 
     systemctl daemon-reload
 }
