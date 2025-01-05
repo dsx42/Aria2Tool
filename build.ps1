@@ -69,16 +69,16 @@ Copy-Item -Path "$PSScriptRoot\aria2c" -Destination "$OutputPath\aria2\aria2c" -
 
 Compress-Archive -Path "$OutputProjectPath" -DestinationPath "$ZipFilePath" -Force
 
-Compress-Archive -Path "$OutputPath\aria2" -DestinationPath "$OutputPath\aria2-x86_64-linux_v$Version.zip" -Force
+Compress-Archive -Path "$OutputPath\aria2" -DestinationPath "$OutputPath\aria2_x86_64_linux_v$Version.zip" -Force
 
 $Hash = Get-FileHash -Path "$ZipFilePath" -Algorithm SHA256
 
 $OpenwrtHash = Get-FileHash -Path "$OutputPath\aria2_tool_openwrt.sh" -Algorithm SHA256
 
-$LinuxHash = Get-FileHash -Path "$OutputPath\aria2-x86_64-linux_v$Version.zip" -Algorithm SHA256
+$LinuxHash = Get-FileHash -Path "$OutputPath\aria2_x86_64_linux_v$Version.zip" -Algorithm SHA256
 
 $Checksum = $Hash.Hash + " $OutputFileName.zip"
-$LinuxChecksum = $LinuxHash.Hash + " aria2-x86_64-linux_v$Version.zip"
+$LinuxChecksum = $LinuxHash.Hash + " aria2_x86_64_linux_v$Version.zip"
 $OpenwrtChecksum = $OpenwrtHash.Hash + ' aria2_tool_openwrt.sh'
 
 Add-Content -Path "$Sha256FilePath" -Value $Checksum
