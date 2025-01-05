@@ -235,6 +235,8 @@ function WriteAria2Config {
     }
 
     $Browser = GetDefaultBrowser
+    $PeerIdPrefix = '-TR4060-'
+    $PeerAgent = 'Transmission/4.0.6'
     $UserAgent = 'Transmission/4.0.6'
     $CookiesPath = ''
     if ($Browser -ieq 'Chrome') {
@@ -309,8 +311,8 @@ function WriteAria2Config {
         'enable-dht6'                      = 'true';
         'follow-torrent'                   = 'false';
         'listen-port'                      = '51413';
-        'peer-id-prefix'                   = '-TR4060-';
-        'peer-agent'                       = 'Transmission/4.0.6';
+        'peer-id-prefix'                   = "$PeerIdPrefix";
+        'peer-agent'                       = "$PeerAgent";
         'enable-rpc'                       = 'true';
         'rpc-allow-origin-all'             = 'true';
         'rpc-listen-all'                   = 'true';

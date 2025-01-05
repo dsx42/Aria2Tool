@@ -3,7 +3,7 @@
     "author": "dsx42",
     "license": "GPL-3.0",
     "home": "https://github.com/dsx42/Aria2Tool",
-    "version": "2025.1.4",
+    "version": "2025.1.5",
     "files": [
         "Aria2Tool.cmd",
         "Aria2Tool.ps1",

@@ -185,6 +185,9 @@ config() {
 
     trackers="$(uci -q get aria2.main.bt_tracker)"
 
+    user_agent="Transmission/4.0.6"
+    peer_id_prefix="-TR4060-"
+
     mems="$(free)"
     index=$((0))
     free=$((0))
@@ -242,7 +245,7 @@ config() {
     uci add_list aria2.main.extra_settings='stream-piece-selector=geom'
     uci set aria2.main.timeout='10'
     uci set aria2.main.http_accept_gzip='true'
-    uci set aria2.main.user_agent='Transmission/4.0.6'
+    uci set aria2.main.user_agent="${user_agent}"
     uci set aria2.main.bt_detach_seed_only='true'
     uci set aria2.main.bt_enable_lpd='true'
     uci add_list aria2.main.extra_settings='bt-force-encryption=true'
@@ -273,8 +276,8 @@ config() {
     uci set aria2.main.enable_dht6='true'
     uci set aria2.main.follow_torrent='false'
     uci set aria2.main.listen_port='51413'
-    uci set aria2.main.peer_id_prefix='-TR4060-'
-    uci add_list aria2.main.extra_settings='peer-agent=Transmission/4.0.6'
+    uci set aria2.main.peer_id_prefix="${peer_id_prefix}"
+    uci add_list aria2.main.extra_settings="peer-agent=${user_agent}"
     uci set aria2.main.seed_ratio='1'
     # enable-rpc auto set
     # rpc-allow-origin-all auto set
