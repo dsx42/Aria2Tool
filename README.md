@@ -56,9 +56,9 @@ RPC 端口为 6800，未设置 RPC 密钥，示例如下：
 # 下载
 wget -p /opt 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.5/aria2_x86_64_linux_v2025.1.5.zip'
 # 解压
-unzip /oppt/aria2_x86_64_linux_v2025.1.5.zip -d /opt
+unzip /opt/aria2_x86_64_linux_v2025.1.5.zip -d /opt
 # 安装并指定下载目录
-/usr/bin/env bash /oppt/aria2/aria2_tool.sh install /mnt/usb/download
+/usr/bin/env bash /opt/aria2/aria2_tool.sh install /mnt/usb/download
 # 设为开机启动
 systemctl enable aria2
 # 启动 aria2
