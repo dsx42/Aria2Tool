@@ -193,10 +193,10 @@ function config() {
     # 若未指定参数，则从旧配置文件获取
     if [ -f "${CONF_PATH}" ]; then
         if [ -z "${download_dir}" ]; then
-            download_dir="$(grep '^dir=' ${CONF_PATH} | awk -F '=' '{print $2}')"
+            download_dir="$(sed -n 's_^dir=__p' ${CONF_PATH})"
         fi
         if [ -z "${trackers}" ]; then
-            trackers="$(grep '^bt-tracker=' ${CONF_PATH} | awk -F '=' '{print $2}')"
+            trackers="$(sed -n 's_^bt-tracker=__p' ${CONF_PATH})"
         fi
     fi
 
