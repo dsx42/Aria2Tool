@@ -421,7 +421,6 @@ function start() {
         return 1
     fi
 
-    # rm -rf "${LOG_PATH}"
     ${APP_PATH} --conf-path=${CONF_PATH}
 
     if [ $? == 0 ]; then
