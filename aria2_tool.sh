@@ -346,7 +346,7 @@ function install() {
 	[Service]
 	Type=forking
 	ExecStart=/usr/bin/env bash ${SCRIPT_PATH} start
-	ExecReload=/usr/bin/env bash ${SCRIPT_PATH} reload
+	ExecReload=/usr/bin/env bash ${SCRIPT_PATH} reload || /bin/echo "aria2 reload failed"
 	ExecStop=/usr/bin/env bash ${SCRIPT_PATH} stop
 	RestartSec=1
 	TimeoutSec=0
@@ -592,6 +592,8 @@ function reload() {
     save_session
 
     change_tracker "${tracker_all_str}"
+
+    save_session
 }
 
 case "${1}" in
