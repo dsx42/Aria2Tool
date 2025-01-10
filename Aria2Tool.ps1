@@ -363,7 +363,7 @@ function WriteAria2Config {
 
 function GetTrackers {
 
-    $GithubProxy = 'https://ghgo.xyz'
+    $GithubProxy = 'https://www.ghproxy.cn'
 
     $UrlArray = @(
         'https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt',
@@ -632,7 +632,7 @@ function AutoUpdateBtTrackerByAria2Tool {
         return
     }
 
-    $TimeSpan = New-Object -TypeName 'System.TimeSpan' -ArgumentList 4, 0, 0
+    $TimeSpan = New-Object -TypeName 'System.TimeSpan' -ArgumentList 12, 0, 0
     $JobOption = New-ScheduledJobOption -RunElevated -RequireNetwork -ContinueIfGoingOnBattery -StartIfOnBattery
     Register-ScheduledJob -ScriptBlock {
         param($Path)

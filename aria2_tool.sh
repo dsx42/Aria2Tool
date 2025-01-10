@@ -25,7 +25,7 @@ SERVICE_PATH="/etc/systemd/system/aria2.service"
 USER_AGENT="Transmission/4.0.6"
 PEER_ID_PREFIX="-TR4060-"
 
-GITHUB_PROXY="https://ghgo.xyz"
+GITHUB_PROXY="https://www.ghproxy.cn"
 
 TRACKER_SOURCES=(
     'https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt'
@@ -381,7 +381,7 @@ function auto_reload() {
 
     (
         crontab -l
-        echo "* */4 * * * /bin/systemctl reload aria2"
+        echo "0 8 * * * /bin/systemctl reload aria2"
     ) | uniq | crontab -
 
     systemctl restart cron

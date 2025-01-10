@@ -48,7 +48,7 @@ update_tracker() {
         return
     fi
 
-    github_proxy='https://ghgo.xyz'
+    github_proxy='https://www.ghproxy.cn'
 
     sources='
         https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt
@@ -455,7 +455,7 @@ auto_update_tracker() {
 
     (
         crontab -l
-        echo "* */4 * * * /bin/sh ${script_file_path} reload"
+        echo "0 8 * * * /bin/sh ${script_file_path} reload"
     ) | uniq | crontab -
 
     /etc/init.d/cron restart
