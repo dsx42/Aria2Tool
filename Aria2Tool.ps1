@@ -502,6 +502,66 @@ function SaveSession {
     Write-Host -Object '调用 aria2.saveSession 成功' -ForegroundColor Green
 }
 
+function PauseAll {
+
+    $Params = @{
+        'jsonrpc' = '2.0';
+        'id'      = 'Aria2Tool';
+        'method'  = 'aria2.pauseAll'
+    }
+
+    $Response = $null
+    try {
+        $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 1 `
+            -Body (ConvertTo-Json -InputObject $Params) -ContentType 'application/json'
+    }
+    catch {
+        Write-Host -Object ''
+        if ($_) {
+            Write-Host -Object "$_" -ForegroundColor Red
+        }
+        $Response = $null
+    }
+    if (!$Response -or !$Response.result -or $Response.result -ine 'OK') {
+        Write-Host -Object ''
+        Write-Host -Object '调用 aria2.pauseAll 失败' -ForegroundColor Red
+        return
+    }
+
+    Write-Host -Object ''
+    Write-Host -Object '调用 aria2.pauseAll 成功' -ForegroundColor Green
+}
+
+function UnpauseAll {
+
+    $Params = @{
+        'jsonrpc' = '2.0';
+        'id'      = 'Aria2Tool';
+        'method'  = 'aria2.unpauseAll'
+    }
+
+    $Response = $null
+    try {
+        $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 1 `
+            -Body (ConvertTo-Json -InputObject $Params) -ContentType 'application/json'
+    }
+    catch {
+        Write-Host -Object ''
+        if ($_) {
+            Write-Host -Object "$_" -ForegroundColor Red
+        }
+        $Response = $null
+    }
+    if (!$Response -or !$Response.result -or $Response.result -ine 'OK') {
+        Write-Host -Object ''
+        Write-Host -Object '调用 aria2.unpauseAll 失败' -ForegroundColor Red
+        return
+    }
+
+    Write-Host -Object ''
+    Write-Host -Object '调用 aria2.unpauseAll 成功' -ForegroundColor Green
+}
+
 function Shutdown {
 
     $Params = @{
@@ -696,6 +756,7 @@ function StartAria2 {
     $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
     if ($Aria2Process) {
         AutoUpdateBtTrackerByAria2Tool -Enabled
+        UnpauseAll
         Write-Host -Object ''
         Write-Host -Object 'Aria2 启动成功' -ForegroundColor Green
         return
@@ -719,6 +780,7 @@ function StopAria2 {
     }
 
     SaveSession
+    PauseAll
     Shutdown
 
     $RetryCount = 1
