@@ -9,7 +9,7 @@
 
 ## Windows 10/11
 
-从如下链接下载最新的版本：`Aria2Tool_v2025.1.5.zip`
+从如下链接下载最新的版本：`Aria2Tool_v2025.1.10.zip`
 
 > https://github.com/dsx42/Aria2Tool/releases
 
@@ -21,12 +21,12 @@
 * `wget`：发起网络请求
 * `zip`：解压缩
 
-从如下链接下载最新的版本：`aria2_x86_64_linux_v2025.1.5.zip`
+从如下链接下载最新的版本：`aria2_x86_64_linux_v2025.1.10.zip`
 
 > https://github.com/dsx42/Aria2Tool/releases
 
 ```bash
-wget -p '/opt' 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.5/aria2_x86_64_linux_v2025.1.5.zip'
+wget -p '/opt' 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.10/aria2_x86_64_linux_v2025.1.10.zip'
 ```
 
 ## OpenWrt 23.05.5
@@ -36,7 +36,7 @@ wget -p '/opt' 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.5/a
 > https://github.com/dsx42/Aria2Tool/releases
 
 ```bash
-wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.5/aria2_tool_openwrt.sh'
+wget -O /aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.10/aria2_tool_openwrt.sh'
 ```
 
 # 如何使用本工具？
@@ -54,9 +54,9 @@ RPC 端口为 6800，未设置 RPC 密钥，示例如下：
 
 ```bash
 # 下载
-wget -p /opt 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.5/aria2_x86_64_linux_v2025.1.5.zip'
+wget -p /opt 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.10/aria2_x86_64_linux_v2025.1.10.zip'
 # 解压
-unzip /opt/aria2_x86_64_linux_v2025.1.5.zip -d /opt
+unzip /opt/aria2_x86_64_linux_v2025.1.10.zip -d /opt
 # 安装并指定下载目录
 /usr/bin/env bash /opt/aria2/aria2_tool.sh install /mnt/usb/download
 # 设为开机启动
@@ -103,7 +103,7 @@ mkdir -p /etc/aria2
 # 建立 Aria2 下载文件目录
 mkdir -p /mnt/sda/download
 # 下载 Aria2 脚本到 Aria2 配置文件目录
-wget -O /etc/aria2/aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.5/aria2_tool_openwrt.sh'
+wget -O /etc/aria2/aria2_tool_openwrt.sh 'https://github.com/dsx42/Aria2Tool/releases/download/v2025.1.10/aria2_tool_openwrt.sh'
 # 安装 Aria2，并指定下载文件目录
 /bin/sh /etc/aria2/aria2_tool_openwrt.sh install '/mnt/sda/download'
 # Aria2 设为开机启动

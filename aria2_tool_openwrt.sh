@@ -271,11 +271,11 @@ config() {
     uci add_list aria2.main.extra_settings='dht-entry-point6=dht.transmissionbt.com:6881'
     # dht-file-path auto set
     # dht-file-path6 auto set
-    uci set aria2.main.dht_listen_port='51413'
+    uci set aria2.main.dht_listen_port='6884'
     uci set aria2.main.enable_dht='true'
     uci set aria2.main.enable_dht6='true'
     uci set aria2.main.follow_torrent='false'
-    uci set aria2.main.listen_port='51413'
+    uci set aria2.main.listen_port='6991'
     uci set aria2.main.peer_id_prefix="${peer_id_prefix}"
     uci add_list aria2.main.extra_settings="peer-agent=${user_agent}"
     uci set aria2.main.seed_ratio='1'

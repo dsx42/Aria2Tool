@@ -307,10 +307,10 @@ function WriteAria2Config {
         'dht-entry-point6'                 = 'dht.transmissionbt.com:6881';
         'dht-file-path'                    = "$PSScriptRoot\dht.dat";
         'dht-file-path6'                   = "$PSScriptRoot\dht6.dat";
-        'dht-listen-port'                  = '51413';
+        'dht-listen-port'                  = '6884';
         'enable-dht6'                      = 'true';
         'follow-torrent'                   = 'false';
-        'listen-port'                      = '51413';
+        'listen-port'                      = '6991';
         'peer-id-prefix'                   = "$PeerIdPrefix";
         'peer-agent'                       = "$PeerAgent";
         'enable-rpc'                       = 'true';
@@ -632,7 +632,7 @@ function AutoUpdateBtTrackerByAria2Tool {
         return
     }
 
-    $TimeSpan = New-Object -TypeName 'System.TimeSpan' -ArgumentList 12, 0, 0
+    $TimeSpan = New-Object -TypeName 'System.TimeSpan' -ArgumentList 20, 0, 0
     $JobOption = New-ScheduledJobOption -RunElevated -RequireNetwork -ContinueIfGoingOnBattery -StartIfOnBattery
     Register-ScheduledJob -ScriptBlock {
         param($Path)
