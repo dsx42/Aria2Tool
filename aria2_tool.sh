@@ -72,6 +72,52 @@ function save_session() {
     fi
 }
 
+function pause_all() {
+
+    # 注意：-EOL 只能忽略 Tab，不会忽略空格，且结尾的 EOL 不能有空格
+    local param="$(
+        cat <<-EOL
+	{
+	    "jsonrpc": "2.0",
+	    "method": "aria2.pauseAll",
+	    "id": "aria2_tool"
+	}
+	EOL
+    )"
+
+    local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    if [ -z "${status}" ]; then
+        echo 'call aria2.pauseAll fail'
+        return 1
+    else
+        echo 'call aria2.pauseAll success'
+        return 0
+    fi
+}
+
+function unpause_all() {
+
+    # 注意：-EOL 只能忽略 Tab，不会忽略空格，且结尾的 EOL 不能有空格
+    local param="$(
+        cat <<-EOL
+	{
+	    "jsonrpc": "2.0",
+	    "method": "aria2.unpauseAll",
+	    "id": "aria2_tool"
+	}
+	EOL
+    )"
+
+    local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    if [ -z "${status}" ]; then
+        echo 'call aria2.pauseAll fail'
+        return 1
+    else
+        echo 'call aria2.pauseAll success'
+        return 0
+    fi
+}
+
 function shutdown() {
 
     # 注意：-EOL 只能忽略 Tab，不会忽略空格，且结尾的 EOL 不能有空格
@@ -382,7 +428,7 @@ function auto_reload() {
 
     (
         crontab -l
-        echo "0 8 * * * /bin/systemctl reload aria2"
+        echo "0 8 * * * /bin/systemctl reload aria2 && /bin/systemctl restart aria2"
     ) | uniq | crontab -
 
     systemctl restart cron
@@ -428,6 +474,7 @@ function start() {
         pidMsg="$(ps -ef | grep ${APP_NAME} | grep -v grep | awk '{print $2}')"
         if [ -n "${pidMsg}" ]; then
             auto_reload
+            unpause_all
             echo "${APP_NAME} running, start success, pid=${pidMsg}"
             return 0
         fi
@@ -449,6 +496,8 @@ function stop() {
     fi
 
     save_session
+
+    pause_all
 
     shutdown
     sleep 2
