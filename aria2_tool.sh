@@ -315,7 +315,7 @@ function config() {
 	bt-enable-lpd=true
 	bt-force-encryption=true
 	bt-load-saved-metadata=true
-	bt-max-peers=128
+	bt-max-peers=64
 	bt-min-crypto-level=arc4
 	bt-prioritize-piece=head
 	bt-remove-unselected-file=true
@@ -342,7 +342,7 @@ function config() {
 	rpc-max-request-size=10M
 	allow-piece-length-change=true
 	always-resume=false
-	auto-save-interval=20
+	auto-save-interval=600
 	conf-path=${CONF_PATH}
 	content-disposition-default-utf8=true
 	daemon=true
@@ -354,7 +354,7 @@ function config() {
 	log-level=notice
 	summary-interval=0
 	save-session=${SESSION_PATH}
-	save-session-interval=20
+	save-session-interval=60
 	EOL
 }
 
@@ -393,7 +393,7 @@ function install() {
 	[Service]
 	Type=forking
 	ExecStart=/usr/bin/env bash ${SCRIPT_PATH} start
-	ExecReload=/usr/bin/env bash ${SCRIPT_PATH} reload || /bin/echo "aria2 reload failed"
+	ExecReload=/usr/bin/env bash ${SCRIPT_PATH} reload
 	ExecStop=/usr/bin/env bash ${SCRIPT_PATH} stop
 	RestartSec=1
 	TimeoutSec=0
