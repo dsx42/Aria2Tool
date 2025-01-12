@@ -62,7 +62,7 @@ function save_session() {
 	EOL
     )"
 
-    local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.saveSession fail'
         return 1
@@ -85,7 +85,7 @@ function pause_all() {
 	EOL
     )"
 
-    local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.pauseAll fail'
         return 1
@@ -108,7 +108,7 @@ function unpause_all() {
 	EOL
     )"
 
-    local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.pauseAll fail'
         return 1
@@ -131,7 +131,7 @@ function shutdown() {
 	EOL
     )"
 
-    local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.shutdown fail'
         return 1
@@ -154,7 +154,7 @@ function force_shutdown() {
 	EOL
     )"
 
-    local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.forceShutdown fail'
         return 1
@@ -184,7 +184,7 @@ function change_tracker() {
 	EOL
     )"
 
-    local status=$(wget -q -T 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.changeGlobalOption fail'
         return 1
@@ -298,7 +298,7 @@ function config() {
 	log=${LOG_PATH}
 	max-concurrent-downloads=50
 	continue=true
-	connect-timeout=10
+	connect-timeout=3
 	max-connection-per-server=16
 	max-tries=0
 	min-split-size=4M
@@ -308,14 +308,14 @@ function config() {
 	server-stat-if=${BASE_DIR}/server.status
 	split=16
 	stream-piece-selector=geom
-	timeout=10
+	timeout=3
 	http-accept-gzip=true
 	user-agent=${USER_AGENT}
 	bt-detach-seed-only=true
 	bt-enable-lpd=true
 	bt-force-encryption=true
 	bt-load-saved-metadata=true
-	bt-max-peers=64
+	bt-max-peers=16
 	bt-min-crypto-level=arc4
 	bt-prioritize-piece=head
 	bt-remove-unselected-file=true
@@ -323,8 +323,8 @@ function config() {
 	bt-request-peer-speed-limit=5
 	bt-save-metadata=true
 	bt-tracker=${trackers}
-	bt-tracker-connect-timeout=10
-	bt-tracker-timeout=10
+	bt-tracker-connect-timeout=3
+	bt-tracker-timeout=3
 	dht-entry-point=dht.transmissionbt.com:6881
 	dht-entry-point6=dht.transmissionbt.com:6881
 	dht-file-path=${BASE_DIR}/dht.dat
