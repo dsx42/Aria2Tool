@@ -495,9 +495,8 @@ function stop() {
         return 0
     fi
 
-    save_session
-
     pause_all
+    save_session
 
     shutdown
     sleep 2
@@ -640,10 +639,7 @@ function reload() {
         return 0
     fi
 
-    save_session
-
     change_tracker "${tracker_all_str}"
-
     save_session
 
     return 0
