@@ -62,7 +62,7 @@ function save_session() {
 	EOL
     )"
 
-    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -T 3 -t 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.saveSession fail'
         return 1
@@ -85,7 +85,7 @@ function pause_all() {
 	EOL
     )"
 
-    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -T 3 -t 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.pauseAll fail'
         return 1
@@ -108,7 +108,7 @@ function unpause_all() {
 	EOL
     )"
 
-    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -T 3 -t 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.pauseAll fail'
         return 1
@@ -131,7 +131,7 @@ function shutdown() {
 	EOL
     )"
 
-    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -T 3 -t 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.shutdown fail'
         return 1
@@ -154,7 +154,7 @@ function force_shutdown() {
 	EOL
     )"
 
-    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -T 3 -t 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.forceShutdown fail'
         return 1
@@ -184,7 +184,7 @@ function change_tracker() {
 	EOL
     )"
 
-    local status=$(wget -q -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    local status=$(wget -q -T 3 -t 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
         echo 'call aria2.changeGlobalOption fail'
         return 1
@@ -298,7 +298,7 @@ function config() {
 	log=${LOG_PATH}
 	max-concurrent-downloads=50
 	continue=true
-	connect-timeout=3
+	connect-timeout=10
 	max-connection-per-server=16
 	max-tries=0
 	min-split-size=4M
@@ -308,23 +308,23 @@ function config() {
 	server-stat-if=${BASE_DIR}/server.status
 	split=16
 	stream-piece-selector=geom
-	timeout=3
+	timeout=10
 	http-accept-gzip=true
 	user-agent=${USER_AGENT}
 	bt-detach-seed-only=true
 	bt-enable-lpd=true
 	bt-force-encryption=true
 	bt-load-saved-metadata=true
-	bt-max-peers=16
+	bt-max-peers=128
 	bt-min-crypto-level=arc4
 	bt-prioritize-piece=head
 	bt-remove-unselected-file=true
 	bt-require-crypto=true
-	bt-request-peer-speed-limit=5
+	bt-request-peer-speed-limit=5M
 	bt-save-metadata=true
 	bt-tracker=${trackers}
-	bt-tracker-connect-timeout=3
-	bt-tracker-timeout=3
+	bt-tracker-connect-timeout=10
+	bt-tracker-timeout=10
 	dht-entry-point=dht.transmissionbt.com:6881
 	dht-entry-point6=dht.transmissionbt.com:6881
 	dht-file-path=${BASE_DIR}/dht.dat
@@ -342,7 +342,7 @@ function config() {
 	rpc-max-request-size=10M
 	allow-piece-length-change=true
 	always-resume=false
-	auto-save-interval=600
+	auto-save-interval=20
 	conf-path=${CONF_PATH}
 	content-disposition-default-utf8=true
 	daemon=true
@@ -354,7 +354,7 @@ function config() {
 	log-level=notice
 	summary-interval=0
 	save-session=${SESSION_PATH}
-	save-session-interval=60
+	save-session-interval=20
 	EOL
 }
 
@@ -428,7 +428,7 @@ function auto_reload() {
 
     (
         crontab -l
-        echo "0 8 * * * /bin/systemctl reload aria2 && /bin/systemctl restart aria2"
+        echo "0 10 * * * /bin/systemctl reload aria2 && /bin/systemctl restart aria2"
     ) | uniq | crontab -
 
     systemctl restart cron
@@ -517,7 +517,8 @@ function stop() {
         return 0
     fi
 
-    ps -ef | grep ${APP_NAME} | grep -v grep | awk '{print $2}' | xargs kill
+    # 有下载中的任务时，因 aria2 自身的 bug，会导致 rpc 无响应，此处必须强杀进程，即使 pause_all 失败也不会丢失下载中的任务
+    ps -ef | grep ${APP_NAME} | grep -v grep | awk '{print $2}' | xargs kill -9
     sleep 2
     pidMsg="$(ps -ef | grep ${APP_NAME} | grep -v grep | awk '{print $2}')"
     if [ -n "${pidMsg}" ]; then
@@ -551,9 +552,9 @@ function reload() {
     for url in ${TRACKER_SOURCES[@]}; do
         echo "tracker source: ${url}"
 
-        local content="$(wget -q -T 1 -O - ${url})"
+        local content="$(wget -q -T 3 -t 1 -O - ${url})"
         if [ -z "${content}" ]; then
-            content="$(wget -q -T 2 -O - ${GITHUB_PROXY}/${url})"
+            content="$(wget -q -T 5 -t 1 -O - ${GITHUB_PROXY}/${url})"
         fi
         if [ -z "${content}" ]; then
             echo "tracker source invalid: ${GITHUB_PROXY}/${url}"
@@ -644,6 +645,8 @@ function reload() {
     change_tracker "${tracker_all_str}"
 
     save_session
+
+    return 0
 }
 
 case "${1}" in
