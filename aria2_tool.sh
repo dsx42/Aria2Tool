@@ -110,10 +110,14 @@ function unpause_all() {
 
     local status=$(wget -q -T 3 -t 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
     if [ -z "${status}" ]; then
-        echo 'call aria2.pauseAll fail'
+        sleep 3
+        status=$(wget -q -T 3 -t 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+    fi
+    if [ -z "${status}" ]; then
+        echo 'call aria2.unpauseAll fail'
         return 1
     else
-        echo 'call aria2.pauseAll success'
+        echo 'call aria2.unpauseAll success'
         return 0
     fi
 }
