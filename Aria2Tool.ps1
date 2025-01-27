@@ -214,7 +214,8 @@ function WriteAria2Config {
 
     # 磁盘内存缓存最大 1024M，最小 16M
     $DiskCache = 16
-    $AvailableMBytes = (Get-CimInstance -ClassName Win32_PerfFormattedData_PerfOS_Memory).AvailableMBytes
+    # $AvailableMBytes = (Get-CimInstance -ClassName Win32_PerfFormattedData_PerfOS_Memory).AvailableMBytes
+    $AvailableMBytes = (Get-CimInstance -ClassName Win32_ComputerSystem).TotalPhysicalMemory / 1024 / 1024
     if ($AvailableMBytes -gt (1024 * 4)) {
         $DiskCache = 1024
     }
@@ -553,6 +554,34 @@ function UnpauseAll {
         $Response = $null
     }
     if (!$Response -or !$Response.result -or $Response.result -ine 'OK') {
+        Start-Sleep -Seconds 3
+        try {
+            $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 1 `
+                -Body (ConvertTo-Json -InputObject $Params) -ContentType 'application/json'
+        }
+        catch {
+            Write-Host -Object ''
+            if ($_) {
+                Write-Host -Object "$_" -ForegroundColor Red
+            }
+            $Response = $null
+        }
+        if (!$Response -or !$Response.result -or $Response.result -ine 'OK') {
+            Start-Sleep -Seconds 4
+            try {
+                $Response = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:6800/jsonrpc' -TimeoutSec 1 `
+                    -Body (ConvertTo-Json -InputObject $Params) -ContentType 'application/json'
+            }
+            catch {
+                Write-Host -Object ''
+                if ($_) {
+                    Write-Host -Object "$_" -ForegroundColor Red
+                }
+                $Response = $null
+            }
+        }
+    }
+    if (!$Response -or !$Response.result -or $Response.result -ine 'OK') {
         Write-Host -Object ''
         Write-Host -Object '调用 aria2.unpauseAll 失败' -ForegroundColor Red
         return
@@ -756,6 +785,7 @@ function StartAria2 {
     $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
     if ($Aria2Process) {
         AutoUpdateBtTrackerByAria2Tool -Enabled
+        Start-Sleep -Seconds 3
         UnpauseAll
         Write-Host -Object ''
         Write-Host -Object 'Aria2 启动成功' -ForegroundColor Green
@@ -779,35 +809,38 @@ function StopAria2 {
         return
     }
 
-    SaveSession
     PauseAll
-    Shutdown
+    SaveSession
 
-    $RetryCount = 1
-    while ($true) {
-        $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
-        if (!$Aria2Process) {
-            Write-Host -Object ''
-            Write-Host -Object 'Aria2 关闭成功' -ForegroundColor Green
-            return
-        }
-        $RetryCount = $RetryCount + 1
-        Start-Sleep -Seconds 3
-        if ($RetryCount -gt 10) {
-            ForceShutdown
-            Start-Sleep -Seconds 3
-            $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
-            if (!$Aria2Process) {
-                Write-Host -Object ''
-                Write-Host -Object 'Aria2 强制关闭成功' -ForegroundColor Yellow
-                return
-            }
-            Stop-Process -InputObject $Aria2Process -Force
-            Write-Host -Object ''
-            Write-Host -Object '强杀 Aria2 进程' -ForegroundColor Red
-            return
-        }
+    Shutdown
+    Start-Sleep -Seconds 2
+    $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
+    if (!$Aria2Process) {
+        Write-Host -Object ''
+        Write-Host -Object 'Aria2 关闭成功(Shutdown)' -ForegroundColor Green
+        return
     }
+
+    ForceShutdown
+    Start-Sleep -Seconds 2
+    $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
+    if (!$Aria2Process) {
+        Write-Host -Object ''
+        Write-Host -Object 'Aria2 关闭成功(ForceShutdown)' -ForegroundColor Green
+        return
+    }
+
+    Stop-Process -InputObject $Aria2Process -Force
+    Start-Sleep -Seconds 2
+    $Aria2Process = Get-Process -Name 'aria2c' -ErrorAction SilentlyContinue
+    if (!$Aria2Process) {
+        Write-Host -Object ''
+        Write-Host -Object 'Aria2 关闭成功(kill)' -ForegroundColor Green
+        return
+    }
+
+    Write-Host -Object ''
+    Write-Host -Object 'Aria2 关闭失败' -ForegroundColor Red
 }
 
 function CreateShortcut {

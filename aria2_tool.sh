@@ -112,6 +112,10 @@ function unpause_all() {
     if [ -z "${status}" ]; then
         sleep 3
         status=$(wget -q -T 3 -t 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+        if [ -z "${status}" ]; then
+            sleep 4
+            status=$(wget -q -T 3 -t 1 -O - --post-data="${param}" 'http://127.0.0.1:6800/jsonrpc' | grep -e 'OK')
+        fi
     fi
     if [ -z "${status}" ]; then
         echo 'call aria2.unpauseAll fail'
@@ -478,6 +482,7 @@ function start() {
         pidMsg="$(ps -ef | grep ${APP_NAME} | grep -v grep | awk '{print $2}')"
         if [ -n "${pidMsg}" ]; then
             auto_reload
+            sleep 3
             unpause_all
             echo "${APP_NAME} running, start success, pid=${pidMsg}"
             return 0
@@ -493,6 +498,8 @@ function start() {
 
 function stop() {
 
+    disable_auto_reload
+
     local pidMsg="$(ps -ef | grep ${APP_NAME} | grep -v grep | awk '{print $2}')"
     if [ -z "${pidMsg}" ]; then
         echo "${APP_NAME} not running, no need to stop"
@@ -506,7 +513,6 @@ function stop() {
     sleep 2
     pidMsg="$(ps -ef | grep ${APP_NAME} | grep -v grep | awk '{print $2}')"
     if [ -z "${pidMsg}" ]; then
-        disable_auto_reload
         echo "${APP_NAME} not running, shutdown success"
         return 0
     fi
@@ -515,7 +521,6 @@ function stop() {
     sleep 2
     pidMsg="$(ps -ef | grep ${APP_NAME} | grep -v grep | awk '{print $2}')"
     if [ -z "${pidMsg}" ]; then
-        disable_auto_reload
         echo "${APP_NAME} not running, force shutdown success"
         return 0
     fi
@@ -529,7 +534,6 @@ function stop() {
         return 1
     fi
 
-    disable_auto_reload
     echo "${APP_NAME} not running, stop success"
     return 0
 }
